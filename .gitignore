@@ -1,15 +1,20 @@
-# This .gitignore file should be placed at the root of your Unity project directory
+# Unity .gitignore (multi-project friendly)
 #
-# Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
-#
+# 참고: https://github.com/github/gitignore/blob/main/Unity.gitignore
+# 이 레포는 Unity 프로젝트가 서브폴더에 있을 수 있으므로,
+# 모든 하위 폴더에 대해 공통 Unity 캐시/빌드 폴더를 무시하도록 설정합니다.
+
 .utmp/
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+
+# 어떤 서브폴더에 있든 모든 Unity Library/Temp 등 무시
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/[Ll]ogs/
+**/[Uu]ser[Ss]ettings/
+
 *.log
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.
