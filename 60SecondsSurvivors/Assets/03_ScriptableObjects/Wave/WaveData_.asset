@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acfdba12b46e9be45ba62cb6a8b822e2, type: 3}
+  m_Name: WaveData_
+  m_EditorClassIdentifier: 
+  phases:
+  - startTime: 0
+    endTime: 20
+    spawnInterval: 1.5
+    enemy: {fileID: 11400000, guid: 285971bb5332dce4699fc9e8a314f16f, type: 2}
+    enemies: []
+  - startTime: 20
+    endTime: 40
+    spawnInterval: 1
+    enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
+    enemies:
+    - enemy: {fileID: 11400000, guid: 285971bb5332dce4699fc9e8a314f16f, type: 2}
+      weight: 60
+    - enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
+      weight: 40
+  - startTime: 40
+    endTime: 60
+    spawnInterval: 0.6
+    enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
+    enemies: []
