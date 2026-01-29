@@ -29,6 +29,9 @@ namespace _60SecondsSurvivors.Core
 
         private void Update()
         {
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+                return;
+
             if (!_isRunning) return;
 
             _remainingTime -= Time.deltaTime;

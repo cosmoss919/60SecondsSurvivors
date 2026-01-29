@@ -5,14 +5,17 @@ namespace _60SecondsSurvivors.Enemy
 {
     /// <summary>
     /// 적 체력을 관리합니다.
+    /// 풀링 지원: OnSpawned, Die에서 PoolManager로 반환
     /// </summary>
     public class EnemyHealth : MonoBehaviour
     {
+        private Animator animator;
         private int _maxHp;
         private int _currentHp;
 
         private void Awake()
         {
+            animator = GetComponent<Animator>();
             var enemyBase = GetComponent<EnemyBase>();
             if (enemyBase == null || enemyBase.Data == null)
             {
@@ -25,10 +28,21 @@ namespace _60SecondsSurvivors.Enemy
             _currentHp = _maxHp;
         }
 
+        public void OnSpawned()
+        {
+            _currentHp = _maxHp;
+            if (animator != null)
+            {
+                animator.ResetTrigger("Hit");
+                animator.SetBool("Dead", false);
+            }
+        }
+
         public void TakeDamage(int amount)
         {
             if (amount <= 0) return;
 
+            animator.SetTrigger("Hit");
             _currentHp -= amount;
 
             if (_currentHp <= 0)
@@ -40,8 +54,8 @@ namespace _60SecondsSurvivors.Enemy
 
         private void Die()
         {
-            // TODO: 점수, 아이템 드랍 등 추후 연동
-            Destroy(gameObject);
+            animator.SetBool("Dead", true);
+            PoolManager.Instance.ReleaseToPool(gameObject);
         }
     }
 }

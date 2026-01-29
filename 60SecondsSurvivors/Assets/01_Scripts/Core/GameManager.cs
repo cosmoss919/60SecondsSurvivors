@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace _60SecondsSurvivors.Core
@@ -8,7 +9,7 @@ namespace _60SecondsSurvivors.Core
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
-
+        public bool IsGameOver => _isGameOver;
         private bool _isGameOver;
 
         private void Awake()
@@ -33,7 +34,7 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
-            SceneLoader.LoadResultScene(false);
+            StartCoroutine(DelayedLoadResult(false));
         }
 
         public void OnTimeOver()
@@ -41,7 +42,13 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
-            SceneLoader.LoadResultScene(true);
+            StartCoroutine(DelayedLoadResult(false));
+        }
+
+        private IEnumerator DelayedLoadResult(bool isWin)
+        {
+            yield return new WaitForSeconds(3f);
+            SceneLoader.LoadResultScene(isWin);
         }
     }
 }

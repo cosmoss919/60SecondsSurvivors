@@ -8,7 +8,7 @@ namespace _60SecondsSurvivors.UI
     public class GameHUD : MonoBehaviour
     {
         [SerializeField] private TimeManager _timeManager;
-        [SerializeField] private PlayerHealth _playerHealth;
+        [SerializeField] private PlayerController playerController;
 
         [Header("Text")]
         [SerializeField] private TMP_Text _timeText;
@@ -21,9 +21,9 @@ namespace _60SecondsSurvivors.UI
                 _timeText.text = $"TIME: {Mathf.CeilToInt(_timeManager.RemainingTime)}";
             }
 
-            if (_playerHealth != null && _hpText != null)
+            if (playerController != null && _hpText != null)
             {
-                _hpText.text = $"HP: {_playerHealth.CurrentHp}/{_playerHealth.MaxHp}";
+                _hpText.text = $"HP: {playerController.CurrentHp}/{playerController.MaxHp}";
             }
         }
     }

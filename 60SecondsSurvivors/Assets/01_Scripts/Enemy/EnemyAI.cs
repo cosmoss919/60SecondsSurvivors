@@ -6,13 +6,15 @@ namespace _60SecondsSurvivors.Enemy
 {
     public class EnemyAI : MonoBehaviour
     {
-        private float _moveSpeed;
-        private int _damage;
-        private float _damageTick;
+        private float moveSpeed;
+        private int damage;
+        private float damageTick;
 
-        private Transform _target;
-        private PlayerHealth _playerHealth;
-        private float _damageTimer;
+        private Transform target;
+        private PlayerController playerController;
+        private Rigidbody2D rigid;
+        private SpriteRenderer spriteRenderer;
+        private float damageTimer;
 
         private void Awake()
         {
@@ -24,9 +26,12 @@ namespace _60SecondsSurvivors.Enemy
                 return;
             }
 
-            _moveSpeed = enemyBase.Data.moveSpeed;
-            _damage = enemyBase.Data.contactDamage;
-            _damageTick = enemyBase.Data.damageTick;
+            rigid = GetComponent<Rigidbody2D>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
+            moveSpeed = enemyBase.Data.moveSpeed;
+            damage = enemyBase.Data.contactDamage;
+            damageTick = enemyBase.Data.damageTick;
         }
 
         private void Start()
@@ -34,45 +39,60 @@ namespace _60SecondsSurvivors.Enemy
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {
-                _target = player.transform;
+                target = player.transform;
             }
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            if (_target == null) return;
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+                return;
 
-            var direction = (_target.position - transform.position).normalized;
-            transform.position += direction * (_moveSpeed * Time.deltaTime);
+            if (target == null) return;
 
-            if (_playerHealth == null || _damageTick <= 0f) return;
+            Vector2 direction = (target.position - transform.position).normalized;
+            Vector2 nextVec = direction.normalized * moveSpeed * Time.deltaTime;
+            rigid.MovePosition(rigid.position + nextVec);
+            rigid.velocity = Vector2.zero;
 
-            _damageTimer += Time.deltaTime;
-            if (_damageTimer >= _damageTick)
+            TakeDamage();
+        }
+
+        private void LateUpdate()
+        {
+            spriteRenderer.flipX = target.position.x < transform.position.x;
+        }
+
+        private void TakeDamage()
+        {
+            if (playerController == null || damageTick <= 0f) return;
+
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageTick)
             {
-                _damageTimer = 0f;
-                _playerHealth.TakeDamage(_damage);
+                damageTimer = 0f;
+                playerController.TakeDamage(damage);
             }
         }
-        
+
         private void OnTriggerEnter2D(Collider2D other) 
         {
-            var playerHealth = other.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
+            var playerController = other.GetComponent<PlayerController>();
+            if (playerController != null)
             {
-                _playerHealth = playerHealth;
-                _damageTimer = 1f;
+                this.playerController = playerController;
+                damageTimer = 1f;
             }
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (_playerHealth == null) return;
+            if (playerController == null) return;
 
-            if (other.GetComponent<PlayerHealth>() == _playerHealth)
+            if (other.GetComponent<PlayerController>() == playerController)
             {
-                _playerHealth = null;
-                _damageTimer = 0f;
+                playerController = null;
+                damageTimer = 0f;
             }
         }
     }

@@ -11,14 +11,14 @@ GameObject:
   - component: {fileID: 1821700566363800843}
   - component: {fileID: 3619309882718071308}
   - component: {fileID: 3837564427315349885}
-  - component: {fileID: 3934962862875857509}
-  - component: {fileID: 3951334928243222713}
+  - component: {fileID: 112025053095957282}
+  - component: {fileID: 6571431934343872757}
   - component: {fileID: 5543166817948902273}
   - component: {fileID: 2435631066750450089}
-  - component: {fileID: 1844525058999877933}
-  - component: {fileID: -7903520173861932433}
+  - component: {fileID: -8772586892530997181}
+  - component: {fileID: -4496115429262590901}
   m_Layer: 0
-  m_Name: Enemy_1
+  m_Name: Enemy_3
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: -71226823
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 613658156, guid: 1bc6097228993f045852159e71f81d5b, type: 3}
+  m_Sprite: {fileID: 172626504, guid: c4d2ccab0c2ad7e47853b6e31a7ac7c2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -136,7 +136,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.95, y: 1}
   m_EdgeRadius: 0
---- !u!50 &3934962862875857509
+--- !u!50 &112025053095957282
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -163,7 +163,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!95 &3951334928243222713
+--- !u!95 &6571431934343872757
 Animator:
   serializedVersion: 5
   m_ObjectHideFlags: 0
@@ -173,7 +173,7 @@ Animator:
   m_GameObject: {fileID: 2332688743735001202}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f2855d618fc8d9c499189d3f39b9cbbc, type: 2}
+  m_Controller: {fileID: 22100000, guid: 25f7a818644b68042bb0c0c2a28d1550, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192790a4f052bd8448626beda1ffe479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1844525058999877933
+--- !u!114 &-8772586892530997181
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -220,8 +220,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af50a9416e47e5145943380f42f41416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _data: {fileID: 11400000, guid: 285971bb5332dce4699fc9e8a314f16f, type: 2}
---- !u!114 &-7903520173861932433
+  _data: {fileID: 11400000, guid: 75de824a040e19743b397c11ba9a9355, type: 2}
+--- !u!114 &-4496115429262590901
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

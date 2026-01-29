@@ -69,7 +69,6 @@ namespace _60SecondsSurvivors.Data
 
             spawnInterval = phase.spawnInterval;
 
-            // 1) enemies 목록이 있으면 가중치 랜덤
             if (phase.enemies != null && phase.enemies.Length > 0)
             {
                 float total = 0f;
@@ -101,7 +100,6 @@ namespace _60SecondsSurvivors.Data
                 }
             }
 
-            // 2) fallback: 단일 enemy
             enemyData = phase.enemy;
             return enemyData != null;
         }
