@@ -30,5 +30,9 @@ MonoBehaviour:
   - startTime: 40
     endTime: 60
     spawnInterval: 0.6
-    enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
-    enemies: []
+    enemy: {fileID: 0}
+    enemies:
+    - enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
+      weight: 60
+    - enemy: {fileID: 11400000, guid: 75de824a040e19743b397c11ba9a9355, type: 2}
+      weight: 40

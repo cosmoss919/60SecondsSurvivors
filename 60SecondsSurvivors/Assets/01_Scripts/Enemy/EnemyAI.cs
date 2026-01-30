@@ -75,9 +75,9 @@ namespace _60SecondsSurvivors.Enemy
             }
         }
 
-        private void OnTriggerEnter2D(Collider2D other) 
+        private void OnCollisionEnter2D(Collision2D collision)
         {
-            var playerController = other.GetComponent<PlayerController>();
+            var playerController = collision.collider.GetComponent<PlayerController>();
             if (playerController != null)
             {
                 this.playerController = playerController;
@@ -85,11 +85,11 @@ namespace _60SecondsSurvivors.Enemy
             }
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        private void OnCollisionExit2D(Collision2D other)
         {
             if (playerController == null) return;
 
-            if (other.GetComponent<PlayerController>() == playerController)
+            if (other.collider.GetComponent<PlayerController>() == playerController)
             {
                 playerController = null;
                 damageTimer = 0f;

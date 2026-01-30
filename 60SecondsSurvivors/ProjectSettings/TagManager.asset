@@ -50,6 +50,9 @@ TagManager:
   - name: Weapon
     uniqueID: 1655220439
     locked: 0
+  - name: Item
+    uniqueID: 704820901
+    locked: 0
   - name: Enemy
     uniqueID: 4223740473
     locked: 0

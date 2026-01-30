@@ -1,5 +1,6 @@
 using UnityEngine;
 using _60SecondsSurvivors.Core;
+using _60SecondsSurvivors.Item;
 
 namespace _60SecondsSurvivors.Enemy
 {
@@ -55,8 +56,14 @@ namespace _60SecondsSurvivors.Enemy
         private void Die()
         {
             animator.SetBool("Dead", true);
+
+            // 아이템 드랍 시도
+            if (ItemDropper.Instance != null)
+            {
+                ItemDropper.Instance.TryDrop(transform.position);
+            }
+
             PoolManager.Instance.ReleaseToPool(gameObject);
         }
     }
 }
-

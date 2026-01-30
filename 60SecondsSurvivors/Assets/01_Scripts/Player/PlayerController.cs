@@ -1,24 +1,30 @@
 using _60SecondsSurvivors.Core;
+using System.Collections;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace _60SecondsSurvivors.Player
 {
     public class PlayerController : MonoBehaviour
     {
         public static PlayerController Instance { get; private set; }
-        public int CurrentHp => currentHp;
-        public int MaxHp => maxHp;
+        public float CurrentHp => currentHp;
+        public float MaxHp => maxHp;
         public Vector2 Position => transform.position;
         public Vector2 InputVec => inputVec;
-        public int Health => currentHp;
 
         [SerializeField] private float moveSpeed = 5f;
-        [SerializeField] private int maxHp = 100;
-        private int currentHp;
+        [SerializeField] private float maxHp = 100;
+        private float currentHp;
         private Animator animator;
         private Rigidbody2D rigid;
         private SpriteRenderer spriteRenderer;
+        private Material material;
         private Vector2 inputVec;
+
+        // 무적 상태
+        private bool isInvincible;
+        private Coroutine invincibleRoutine;
 
         private void Awake()
         {
@@ -27,6 +33,7 @@ namespace _60SecondsSurvivors.Player
             rigid = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            material = spriteRenderer.material;
 
             if (Instance != null && Instance != this)
             {
@@ -59,6 +66,7 @@ namespace _60SecondsSurvivors.Player
         public void TakeDamage(int amount)
         {
             if (amount <= 0) return;
+            if (isInvincible) return;
 
             currentHp -= amount;
 
@@ -67,6 +75,39 @@ namespace _60SecondsSurvivors.Player
                 currentHp = 0;
                 Die();
             }
+        }
+
+        public void HealPercent(float percent)
+        {
+            if (percent <= 0) return;
+            int heal = Mathf.CeilToInt(maxHp * percent);
+            currentHp += heal;
+            if (currentHp > maxHp) currentHp = maxHp;
+        }
+
+        public void AddMoveSpeedPercent(float percent)
+        {
+            if (percent == 0) return;
+            moveSpeed *= (1f + percent);
+        }
+
+        public void StartInvincible(float duration)
+        {
+            if (invincibleRoutine != null)
+            {
+                StopCoroutine(invincibleRoutine);
+            }
+            invincibleRoutine = StartCoroutine(InvincibleCoroutine(duration));
+        }
+
+        private IEnumerator InvincibleCoroutine(float duration)
+        {
+            isInvincible = true;
+            material.SetFloat("_Invincible", 1f);
+            yield return new WaitForSecondsRealtime(duration);
+            material.SetFloat("_Invincible", 0);
+            isInvincible = false;
+            invincibleRoutine = null;
         }
 
         private void Die()

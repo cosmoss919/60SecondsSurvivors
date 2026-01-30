@@ -11,11 +11,8 @@ namespace _60SecondsSurvivors.Enemy
         [SerializeField] private TimeManager timeManager;
         [SerializeField] private WaveData waveData;
 
-        [SerializeField] private float spawnInterval = 2f;
-
         [SerializeField] private float spawnDistanceX = 7f;
         [SerializeField] private float spawnDistanceY = 16f;
-        [SerializeField] private int maxSpawnAttempts = 10;
 
         private float timer;
 
