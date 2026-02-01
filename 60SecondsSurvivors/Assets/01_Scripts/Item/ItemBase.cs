@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using _60SecondsSurvivors.Player;
 using _60SecondsSurvivors.Core;
 using _60SecondsSurvivors.UI;
@@ -16,23 +16,19 @@ namespace _60SecondsSurvivors.Item
         Invincible
     }
 
-    /// <summary>
-    /// ¾ÆÀÌÅÛ ÇÈ¾÷ ¿ÀºêÁ§Æ® (Ç®¸µ È£È¯)
-    /// Runtime¿¡ ItemData¸¦ ÁÖÀÔ¹Ş¾Æ µ¿ÀÛ
-    /// </summary>
     public class ItemBase : MonoBehaviour, IPoolable
     {
-        // ·±Å¸ÀÓ¿¡ ÁÖÀÔµÇ´Â µ¥ÀÌÅÍ (Á÷·ÄÈ­ÇÏÁö ¾ÊÀ½)
+        // ëŸ°íƒ€ì„ì—ì„œ ì‚¬ìš©ë˜ëŠ” ItemData ë ˆí¼ëŸ°ìŠ¤
         private ItemData runtimeData;
 
         public ItemData Data => runtimeData;
 
         public void OnSpawned()
         {
-            // ÇÊ¿äÇÏ¸é ½Ã°¢/»óÅÂ ÃÊ±âÈ­
+            // í•„ìš” ì‹œ ì´ˆê¸°í™”
         }
 
-        // ItemDropper°¡ µå·Ó ½Ã È£ÃâÇØ¼­ µ¥ÀÌÅÍ ÁÖÀÔ
+        // ItemDropper ë“±ì—ì„œ ë°ì´í„° ì£¼ì…
         public void SetData(ItemData data)
         {
             runtimeData = data;
@@ -45,7 +41,7 @@ namespace _60SecondsSurvivors.Item
             {
                 ApplyToPlayer(player);
 
-                // ItemÀº Ç®¿¡ ³ÖÁö ¾Ê°í ºñÈ°¼ºÈ­ ¹æ½Ä(ÇöÀç PoolManager´Â ItemÀ» Instantiate ÈÄ Disable Ã³¸®)
+                // Pool ì‚¬ìš© ì‹œ ë°˜í™˜, ì•„ë‹ˆë©´ ë¹„í™œì„±í™”
                 if (PoolManager.Instance != null)
                     PoolManager.Instance.ReleaseToPool(gameObject);
                 else
@@ -62,7 +58,7 @@ namespace _60SecondsSurvivors.Item
 
             if (runtimeData == null)
             {
-                GameLog.Error(this, "ItemData°¡ ¾ø½À´Ï´Ù");
+                GameLog.Error(this, "ItemDataê°€ ì„¤ì •ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤.");
             }
 
             type = runtimeData.itemType;
@@ -76,38 +72,37 @@ namespace _60SecondsSurvivors.Item
             switch (type)
             {
                 case ItemType.FireRate:
-                    weapon?.MultiplyFireRate(1f - fValue); // ÀÎÅÍ¹ú °¨¼Ò(°ø¼Ó Áõ°¡)
-                    popupText = $"°ø¼Ó +{Mathf.RoundToInt(fValue * 100f)}%";
+                    weapon?.MultiplyFireRate(1f - fValue); // ë°œì‚¬ ì†ë„ ì¦ê°€(ê°ì†Œ ê°’ ì ìš©)
+                    popupText = $"ë°œì‚¬ì†ë„ +{Mathf.RoundToInt(fValue * 100f)}%";
                     break;
                 case ItemType.Damage:
                     weapon?.MultiplyDamage(1f + fValue);
-                    popupText = $"µ¥¹ÌÁö +{Mathf.RoundToInt(fValue * 100f)}%";
+                    popupText = $"ë°ë¯¸ì§€ +{Mathf.RoundToInt(fValue * 100f)}%";
                     break;
                 case ItemType.MoveSpeed:
                     player.AddMoveSpeedPercent(fValue);
-                    popupText = $"ÀÌµ¿¼Óµµ +{Mathf.RoundToInt(fValue * 100f)}%";
+                    popupText = $"ì´ë™ì†ë„ +{Mathf.RoundToInt(fValue * 100f)}%";
                     break;
                 case ItemType.ProjectileCount:
                     weapon?.AddProjectileCount(iValue);
-                    popupText = $"+{iValue} ¹ß";
+                    popupText = $"+{iValue} ë°œ";
                     break;
                 case ItemType.Piercing:
                     weapon?.AddPierce(iValue);
-                    popupText = $"°üÅë +{iValue}";
+                    popupText = $"ê´€í†µ +{iValue}";
                     break;
                 case ItemType.Heal:
                     player.HealPercent(fValue);
-                    popupText = $"HP È¸º¹ {Mathf.RoundToInt(fValue * 100f)}%";
+                    popupText = $"HP íšŒë³µ {Mathf.RoundToInt(fValue * 100f)}%";
                     break;
                 case ItemType.Invincible:
                     player.StartInvincible(duration);
-                    popupText = $"¹«Àû {duration:0.#}ÃÊ";
+                    popupText = $"ë¬´ì  {duration:0.#}ì´ˆ";
                     break;
             }
 
-            // HUD¿¡ ÆË¾÷ Ç¥½Ã (ScriptableObjectÀÇ displayNameÀÌ ÀÖÀ¸¸é ¿ì¼± »ç¿ë)
-            string display = runtimeData != null && !string.IsNullOrEmpty(runtimeData.displayName) ? runtimeData.displayName : popupText;
-            GameHUD.Instance?.ShowPickup(display);
+            // displayName ì œê±°ë¨ â€” í•­ìƒ popupText ì‚¬ìš©
+            GameHUD.Instance?.ShowPickup(popupText);
         }
     }
 }

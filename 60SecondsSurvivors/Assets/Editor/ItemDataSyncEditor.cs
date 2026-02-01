@@ -24,7 +24,7 @@ namespace _60SecondsSurvivors.Editor
         private void OnGUI()
         {
             GUILayout.Space(6);
-            EditorGUILayout.HelpBox("프로젝트의 ItemData ScriptableObject와 ItemBase 프리팹을 자동으로 연결합니다.\n- prefab이 비어있으면 자동으로 할당\n- displayName이 비어있으면 prefab 이름으로 채움", MessageType.Info);
+            EditorGUILayout.HelpBox("ItemData의 prefab 필드를 자동으로 채웁니다.\n- displayName은 사용하지 않으므로 동기화 대상에서 제외됩니다.", MessageType.Info);
             GUILayout.Space(6);
 
             if (GUILayout.Button("Sync Now", GUILayout.Height(34)))
@@ -75,9 +75,8 @@ namespace _60SecondsSurvivors.Editor
             var prefabByName = itemPrefabs.ToDictionary(p => p.gameObject.name, p => p);
 
             // 매칭 로직:
-            // 1) 이미 prefab이 지정되어 있으면 일단 matched 카운트 증가(변경 여부 체크)
-            // 2) 지정되지 않은 경우 displayName 또는 asset filename으로 프리팹 이름과 매칭 시도
-            // 3) displayName 비어있으면 prefab.name으로 채움
+            // 1) 이미 prefab이 지정되어 있으면 존재 여부만 확인하여 matched 카운트 증가
+            // 2) 지정되지 않은 경우 asset 파일명 또는 부분 매칭으로 prefab을 찾아 할당
             Undo.RecordObjects(dataAssets.ToArray(), "Sync ItemData With Prefabs");
 
             foreach (var data in dataAssets)
@@ -87,12 +86,11 @@ namespace _60SecondsSurvivors.Editor
                 // 이미 연결된 prefab이 프로젝트에 존재하면 matched
                 if (data.prefab != null)
                 {
-                    // prefab이 실제 프리팹 에셋인지 확인
                     var prefabExists = itemPrefabs.Any(p => p == data.prefab);
                     if (prefabExists)
                     {
                         _matched++;
-                        _log.Add($"[Matched] {data.displayName ?? "(no displayName)"} -> {data.prefab.gameObject.name}");
+                        _log.Add($"[Matched] {AssetDatabase.GetAssetPath(data)} -> {data.prefab.gameObject.name}");
                     }
                     else
                     {
@@ -104,52 +102,33 @@ namespace _60SecondsSurvivors.Editor
 
                 if (data.prefab == null)
                 {
-                    // 우선 displayName으로 매칭
-                    if (!string.IsNullOrEmpty(data.displayName) && prefabByName.TryGetValue(data.displayName, out var found))
+                    var path = AssetDatabase.GetAssetPath(data);
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+
+                    // 시도 1: fileName과 동일한 prefab 이름
+                    if (prefabByName.TryGetValue(fileName, out var found))
                     {
                         data.prefab = found;
                         _assigned++;
                         changed = true;
-                        _log.Add($"[Assigned by displayName] {data.displayName} -> {found.gameObject.name}");
+                        _log.Add($"[Assigned by fileName] {fileName} -> {found.gameObject.name}");
                     }
                     else
                     {
-                        // asset 파일 이름(예: ItemData_SomeItem)에서 postfix 제거 또는 prefab 이름 포함 여부로 시도
-                        var path = AssetDatabase.GetAssetPath(data);
-                        var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-                        // 시도 1: fileName과 동일한 prefab 이름
-                        if (prefabByName.TryGetValue(fileName, out found))
+                        // 시도 2: fileName에 포함되는 프리팹 찾기 (부분 매칭)
+                        var partial = itemPrefabs.FirstOrDefault(p => fileName.Contains(p.gameObject.name) || p.gameObject.name.Contains(fileName));
+                        if (partial != null)
                         {
-                            data.prefab = found;
+                            data.prefab = partial;
                             _assigned++;
                             changed = true;
-                            _log.Add($"[Assigned by fileName] {fileName} -> {found.gameObject.name}");
+                            _log.Add($"[Assigned by partial match] {fileName} -> {partial.gameObject.name}");
                         }
                         else
                         {
-                            // 시도 2: fileName에 포함되는 프리팹 찾기 (부분 매칭)
-                            var partial = itemPrefabs.FirstOrDefault(p => fileName.Contains(p.gameObject.name) || p.gameObject.name.Contains(fileName));
-                            if (partial != null)
-                            {
-                                data.prefab = partial;
-                                _assigned++;
-                                changed = true;
-                                _log.Add($"[Assigned by partial match] {fileName} -> {partial.gameObject.name}");
-                            }
-                            else
-                            {
-                                _log.Add($"[Unmatched] {fileName}");
-                            }
+                            _log.Add($"[Unmatched] {fileName}");
                         }
                     }
-                }
-
-                // displayName이 비어있고 prefab이 있으면 prefab.name으로 채움
-                if ((string.IsNullOrEmpty(data.displayName) || data.displayName.Trim().Length == 0) && data.prefab != null)
-                {
-                    data.displayName = data.prefab.gameObject.name;
-                    changed = true;
-                    _log.Add($"[DisplayName set] {data.displayName}");
                 }
 
                 if (changed)

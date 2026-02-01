@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace _60SecondsSurvivors.Item
 {
@@ -8,19 +8,16 @@ namespace _60SecondsSurvivors.Item
         [Header("Prefab & UI")]
         public ItemBase prefab;
 
-        [Tooltip("¿¡µğÅÍ¿¡¼­ Ç¥½ÃµÉ ÀÌ¸§ (ÀÚµ¿ µ¿±âÈ­ °¡´É)")]
-        public string displayName;
-
         [Header("Type & Values")]
         public ItemType itemType;
 
-        [Tooltip("ºñÀ²Çü °ª (¿¹: 0.15 = 15%)")]
+        [Tooltip("ë¹„ìœ¨í˜• ê°’ (ì˜ˆ: 0.15 = 15%)")]
         public float floatValue;
 
-        [Tooltip("Á¤¼öÇü °ª (¿¹: Åõ»çÃ¼ ¼ö, °üÅë ¼ö)")]
+        [Tooltip("ì •ìˆ˜í˜• ê°’ (ì˜ˆ: íˆ¬ì‚¬ì²´ ìˆ˜, ê´€í†µ ìˆ˜)")]
         public int intValue;
 
-        [Tooltip("Áö¼Ó½Ã°£ (¹«Àû µî)")]
+        [Tooltip("ì§€ì†ì‹œê°„ (ë¬´ì  ë“±)")]
         public float duration;
 
         private void Reset()
@@ -28,8 +25,6 @@ namespace _60SecondsSurvivors.Item
             if (floatValue == 0f) floatValue = GetDefaultFloatForType(itemType);
             if (intValue == 0) intValue = GetDefaultIntForType(itemType);
             if (duration == 0f && itemType == ItemType.Invincible) duration = 3f;
-            if (prefab != null && string.IsNullOrEmpty(displayName))
-                displayName = prefab.name;
         }
 
         private static float GetDefaultFloatForType(ItemType t)
