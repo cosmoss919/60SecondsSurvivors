@@ -9722,14 +9722,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropChance: 1
-  itemPrefabs:
-  - {fileID: 985820593318814217, guid: a2f89b1c1b7421545bb3babd0ed851df, type: 3}
-  - {fileID: 4949641165569455925, guid: 50686ec56cf2de14cb494675f0404757, type: 3}
-  - {fileID: 6879684683530507146, guid: c7f5b54ab6978d24fbd68f475cb6a810, type: 3}
-  - {fileID: 405280995478956859, guid: 5d39f0228a8700d418ec26a515ebd5af, type: 3}
-  - {fileID: 482315786335145383, guid: 5102ecd227849284e959a48078966ef4, type: 3}
-  - {fileID: 5464354928523867624, guid: fda00535efa50084a9323ae4f7bf31a8, type: 3}
-  - {fileID: 8120527958434014067, guid: 433b8d52988b92d49bda94a7c76879c7, type: 3}
+  itemDatas:
+  - {fileID: 11400000, guid: c50667b26f099554f988769e96726c2d, type: 2}
+  - {fileID: 11400000, guid: ee49be1bccd079b409f11a9761744972, type: 2}
+  - {fileID: 11400000, guid: 5bb02b7d23ecb994cbf25911b2b3514d, type: 2}
+  - {fileID: 11400000, guid: 5c73c095dd35b4a4aa46c1fa9a1edc4d, type: 2}
+  - {fileID: 11400000, guid: 14b6f31bfe122f44398040ba74f5936d, type: 2}
+  - {fileID: 11400000, guid: 61228a4f8b8f0da478cb29339680b4e8, type: 2}
+  - {fileID: 11400000, guid: 82bd71a3505b035478da1adc3b89d8fa, type: 2}
 --- !u!4 &981235614
 Transform:
   m_ObjectHideFlags: 0

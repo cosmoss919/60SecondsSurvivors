@@ -1,10 +1,9 @@
 using UnityEngine;
 using _60SecondsSurvivors.Core;
-using _60SecondsSurvivors.Item;
 
 namespace _60SecondsSurvivors.Item
 {
-    // 적 처치 시 아이템 드랍을 담당
+    // 적 처치 시 아이템 드랍을 담당 (ItemData 기반)
     public class ItemDropper : MonoBehaviour
     {
         public static ItemDropper Instance { get; private set; }
@@ -13,8 +12,8 @@ namespace _60SecondsSurvivors.Item
         [Range(0f, 1f)]
         public float dropChance = 0.35f;
 
-        [Tooltip("아이템 프리팹 목록 (ItemBase가 붙어 있어야 함)")]
-        public ItemBase[] itemPrefabs;
+        [Tooltip("아이템 데이터 목록 (ItemData SO, prefab 필드에 ItemBase 프리팹 연결)")]
+        public ItemData[] itemDatas;
 
         private void Awake()
         {
@@ -27,33 +26,28 @@ namespace _60SecondsSurvivors.Item
             DontDestroyOnLoad(gameObject);
         }
 
-        private void Start()
-        {
-            //if (PoolManager.Instance != null && itemPrefabs != null)
-            //{
-            //    foreach (var p in itemPrefabs)
-            //    {
-            //        if (p != null)
-            //            PoolManager.Instance.Preload(p);
-            //    }
-            //}
-        }
-
         public void TryDrop(Vector3 position)
         {
-            if (itemPrefabs == null || itemPrefabs.Length == 0) return;
+            if (itemDatas == null || itemDatas.Length == 0) return;
 
             if (Random.value > dropChance) return;
 
             // 랜덤 아이템 선택
-            var prefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
-            if (prefab == null) return;
+            var data = itemDatas[Random.Range(0, itemDatas.Length)];
+            if (data == null || data.prefab == null) return;
 
-            GameObject go = PoolManager.Instance != null ? PoolManager.Instance.GetFromPool(prefab) : Instantiate(prefab.gameObject);
+            GameObject go = PoolManager.Instance != null ? PoolManager.Instance.GetFromPool(data.prefab) : Instantiate(data.prefab.gameObject);
             if (go == null) return;
 
             go.transform.position = position;
             go.transform.rotation = Quaternion.identity;
+
+            // 런타임으로 ItemData 주입
+            var itemBase = go.GetComponent<ItemBase>();
+            if (itemBase != null)
+            {
+                itemBase.SetData(data);
+            }
         }
     }
 }
