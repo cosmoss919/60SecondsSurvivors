@@ -1,7 +1,8 @@
 using _60SecondsSurvivors.Core;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
+using _60SecondsSurvivors.UI;
 
 namespace _60SecondsSurvivors.Player
 {
@@ -15,6 +16,9 @@ namespace _60SecondsSurvivors.Player
 
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float maxHp = 100;
+        [SerializeField] private VirtualJoystick _joystick;
+
+        private float hitFlashDuration = 0.2f;
         private float currentHp;
         private Animator animator;
         private Rigidbody2D rigid;
@@ -26,6 +30,12 @@ namespace _60SecondsSurvivors.Player
         private bool isInvincible;
         private Coroutine invincibleRoutine;
 
+        // 피격 플래시 코루틴 참조
+        private Coroutine hitFlashRoutine;
+
+        // 접촉 데미지 코루틴 관리 (적별로 코루틴 유지)
+        private readonly Dictionary<GameObject, Coroutine> _contactCoroutines = new();
+
         private void Awake()
         {
             currentHp = maxHp;
@@ -33,7 +43,12 @@ namespace _60SecondsSurvivors.Player
             rigid = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
-            material = spriteRenderer.material;
+
+            if (spriteRenderer != null)
+            {
+                // SpriteRenderer의 sharedMaterial 대신 인스턴스화된 material 사용
+                material = spriteRenderer.material;
+            }
 
             if (Instance != null && Instance != this)
             {
@@ -42,14 +57,52 @@ namespace _60SecondsSurvivors.Player
             }
             Instance = this;
         }
+
         private void Update()
         {
-            inputVec.x = Input.GetAxisRaw("Horizontal");
-            inputVec.y = Input.GetAxisRaw("Vertical");
-            inputVec = inputVec.normalized;
+            // 게임 오버이면 모든 입력/이동/접촉 데미지 중지 (애니메이션은 계속 재생)
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+            {
+                inputVec = Vector2.zero;
+                if (rigid != null)
+                    rigid.velocity = Vector2.zero;
+
+                // 접촉 데미지 코루틴 정리
+                if (_contactCoroutines.Count > 0)
+                {
+                    foreach (var kv in _contactCoroutines)
+                    {
+                        if (kv.Value != null)
+                            StopCoroutine(kv.Value);
+                    }
+                    _contactCoroutines.Clear();
+                }
+
+                return;
+            }
+
+            if (_joystick != null && _joystick.Direction != Vector2.zero)
+            {
+                inputVec = _joystick.Direction;
+            }
+            else
+            {
+                inputVec.x = Input.GetAxisRaw("Horizontal");
+                inputVec.y = Input.GetAxisRaw("Vertical");
+                inputVec = inputVec.normalized;
+            }
         }
+
         private void FixedUpdate()
         {
+            // FixedUpdate에서도 GameOver 여부 재확인하여 이동을 확실히 멈춤
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+            {
+                if (rigid != null)
+                    rigid.velocity = Vector2.zero;
+                return;
+            }
+
             rigid.velocity = inputVec * moveSpeed;
         }
 
@@ -70,11 +123,43 @@ namespace _60SecondsSurvivors.Player
 
             currentHp -= amount;
 
+            StartHitFlash();
+
             if (currentHp <= 0)
             {
                 currentHp = 0;
                 Die();
             }
+        }
+
+        private void StartHitFlash()
+        {
+            if (material == null) return;
+
+            if (hitFlashRoutine != null)
+            {
+                StopCoroutine(hitFlashRoutine);
+                hitFlashRoutine = null;
+            }
+
+            hitFlashRoutine = StartCoroutine(HitFlashCoroutine());
+        }
+
+        private IEnumerator HitFlashCoroutine()
+        {
+            material.SetFloat("_HitFlash", 1f);
+
+            float t = 0f;
+            while (t < hitFlashDuration)
+            {
+                t += Time.deltaTime;
+                yield return null;
+            }
+
+            material.SetFloat("_HitFlash", 0f);
+
+
+            hitFlashRoutine = null;
         }
 
         public void HealPercent(float percent)
@@ -103,9 +188,14 @@ namespace _60SecondsSurvivors.Player
         private IEnumerator InvincibleCoroutine(float duration)
         {
             isInvincible = true;
-            material.SetFloat("_Invincible", 1f);
+            if (material != null)
+                material.SetFloat("_Invincible", 1f);
+
             yield return new WaitForSecondsRealtime(duration);
-            material.SetFloat("_Invincible", 0);
+
+            if (material != null)
+                material.SetFloat("_Invincible", 0f);
+
             isInvincible = false;
             invincibleRoutine = null;
         }
@@ -118,10 +208,58 @@ namespace _60SecondsSurvivors.Player
             }
 
             animator.SetTrigger("Dead");
+            rigid.velocity = Vector2.zero;
+        }
+
+        public void StartContactDamage(GameObject enemySource, int damage, float tick)
+        {
+            if (enemySource == null) return;
+            if (_contactCoroutines.ContainsKey(enemySource)) return;
+
+            Coroutine c = StartCoroutine(ContactDamageCoroutine(enemySource, damage, tick));
+            _contactCoroutines[enemySource] = c;
+        }
+
+        public void StopContactDamage(GameObject enemySource)
+        {
+            if (enemySource == null) return;
+            if (_contactCoroutines.TryGetValue(enemySource, out var c))
+            {
+                if (c != null)
+                    StopCoroutine(c);
+                _contactCoroutines.Remove(enemySource);
+            }
+        }
+
+        private IEnumerator ContactDamageCoroutine(GameObject source, int damage, float tick)
+        {
+            if (source == null || !source.activeInHierarchy) yield break;
+
+            TakeDamage(damage);
+
+            while (true)
+            {
+                if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+                    break;
+
+                if (source == null || !source.activeInHierarchy) break;
+
+                yield return new WaitForSeconds(tick);
+
+                TakeDamage(damage);
+            }
+
+            _contactCoroutines.Remove(source);
         }
 
         private void OnDestroy()
         {
+            if (hitFlashRoutine != null)
+                StopCoroutine(hitFlashRoutine);
+
+            if (invincibleRoutine != null)
+                StopCoroutine(invincibleRoutine);
+
             if (Instance == this)
                 Instance = null;
         }

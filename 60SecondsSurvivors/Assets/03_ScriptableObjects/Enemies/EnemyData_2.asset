@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3285106bc4905841b81497c3e39b6a4, type: 3}
   m_Name: EnemyData_2
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2435631066750450089, guid: 4386b71ae76eca74ea8f1beaf49426a3, type: 3}
+  prefab: {fileID: 5543166817948902273, guid: 4386b71ae76eca74ea8f1beaf49426a3, type: 3}
   maxHp: 4
   moveSpeed: 2
   contactDamage: 2
   damageTick: 1
+  score: 15

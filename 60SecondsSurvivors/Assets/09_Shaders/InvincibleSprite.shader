@@ -1,4 +1,4 @@
-Shader "Custom/InvincibleSprite"
+﻿Shader "Custom/InvincibleSprite"
 {
     Properties
     {
@@ -6,6 +6,8 @@ Shader "Custom/InvincibleSprite"
         _Color ("Tint", Color) = (1,1,1,1)
         _Invincible ("Invincible", Float) = 0
         _HueSpeed ("Hue Speed", Float) = 1
+        _HitFlash ("Hit Flash", Float) = 0
+        _HitFlashStrength ("Hit Flash Strength", Float) = 0.4
     }
 
     SubShader
@@ -50,6 +52,8 @@ Shader "Custom/InvincibleSprite"
             float4 _Color;
             float _Invincible;
             float _HueSpeed;
+            float _HitFlash;
+            float _HitFlashStrength;
 
             Varyings vert (Attributes v)
             {
@@ -60,7 +64,7 @@ Shader "Custom/InvincibleSprite"
                 return o;
             }
 
-            // HSV �� RGB ��ȯ
+            // HSV → RGB 변환
             float3 HSVToRGB(float3 c)
             {
                 float4 K = float4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
@@ -72,11 +76,20 @@ Shader "Custom/InvincibleSprite"
             {
                 half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv) * i.color;
 
+                // 1. 무적 무지개
                 if (_Invincible > 0.5)
                 {
                     float hue = frac(_Time.y * _HueSpeed);
                     float3 rainbow = HSVToRGB(float3(hue, 1, 1));
                     col.rgb *= rainbow;
+                }
+
+                // 2. 히트 플래시
+                float hit = saturate(_HitFlash);
+                if (hit > 0.001)
+                {
+                    float strength = hit * _HitFlashStrength;
+                    col.rgb = lerp(col.rgb, float3(1,1,1), strength);
                 }
 
                 return col;

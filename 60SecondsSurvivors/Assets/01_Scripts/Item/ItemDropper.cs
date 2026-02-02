@@ -3,7 +3,6 @@ using _60SecondsSurvivors.Core;
 
 namespace _60SecondsSurvivors.Item
 {
-    // 적 처치 시 아이템 드랍을 담당 (ItemData 기반)
     public class ItemDropper : MonoBehaviour
     {
         public static ItemDropper Instance { get; private set; }
@@ -23,7 +22,12 @@ namespace _60SecondsSurvivors.Item
                 return;
             }
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         public void TryDrop(Vector3 position)

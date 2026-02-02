@@ -6,13 +6,20 @@ namespace _60SecondsSurvivors.UI
 {
     public class ResultUI : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _resultText;
+        [SerializeField] private TMP_Text highScoreText;
+        [SerializeField] private TMP_Text scoreText;
+        private const string PrefKeyHighScore = "60SS_HighScore";
 
         private void Start()
         {
-            if (_resultText != null)
+            int highScore = PlayerPrefs.GetInt(PrefKeyHighScore, 0);
+            if (highScoreText != null)
             {
-                _resultText.text = GameResult.IsWin ? "CLEAR" : "GAME OVER";
+                highScoreText.text = $"High Score : {highScore}";
+            }
+            if (scoreText != null)
+            {
+                scoreText.text = $"Score : {GameResult.Score}";
             }
         }
 

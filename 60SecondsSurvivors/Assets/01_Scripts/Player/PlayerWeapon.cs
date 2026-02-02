@@ -20,7 +20,9 @@ namespace _60SecondsSurvivors.Player
 
         private void Update()
         {
-            // 항상 최신 타겟으로 조준
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+                return;
+
             UpdateAimToNearestEnemy();
 
             timer += Time.deltaTime;
@@ -33,35 +35,32 @@ namespace _60SecondsSurvivors.Player
 
         private void UpdateAimToNearestEnemy()
         {
-            var enemies = FindObjectsOfType<EnemyHealth>();
-            if (enemies == null || enemies.Length == 0)
-                return;
-
+            var ais = FindObjectsOfType<EnemyAI>();
             Vector2 selfPos = transform.position;
-            EnemyHealth nearest = null;
+            EnemyAI nearestAI = null;
             float bestDistSq = float.MaxValue;
 
-            for (int i = 0; i < enemies.Length; i++)
+            for (int i = 0; i < ais.Length; i++)
             {
-                var e = enemies[i];
-                if (e == null || !e.gameObject.activeInHierarchy)
-                    continue;
+                var ai = ais[i];
+                if (ai == null || !ai.gameObject.activeInHierarchy) continue;
+                if (!ai.IsAlive) continue;
 
-                Vector2 ePos = e.transform.position;
+                Vector2 ePos = ai.transform.position;
                 float distSq = (ePos - selfPos).sqrMagnitude;
                 if (distSq < bestDistSq)
                 {
                     bestDistSq = distSq;
-                    nearest = e;
+                    nearestAI = ai;
                 }
             }
 
-            if (nearest != null)
+            if (nearestAI != null)
             {
-                Vector2 dir = (nearest.transform.position - transform.position);
-                if (dir == Vector2.zero)
-                    dir = Vector2.right;
+                Vector2 dir = (nearestAI.transform.position - transform.position);
+                if (dir == Vector2.zero) dir = Vector2.right;
                 lastDirection = dir.normalized;
+                return;
             }
         }
 
@@ -109,7 +108,6 @@ namespace _60SecondsSurvivors.Player
             }
         }
 
-        // 아이템으로부터 호출되는 API들
         public void MultiplyDamage(float factor)
         {
             damageMultiplier *= factor;

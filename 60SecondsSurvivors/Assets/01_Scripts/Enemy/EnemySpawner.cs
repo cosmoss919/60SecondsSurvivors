@@ -20,7 +20,7 @@ namespace _60SecondsSurvivors.Enemy
         {
             if (waveData != null && PoolManager.Instance != null)
             {
-                var prefabs = new HashSet<EnemyHealth>();
+                var prefabs = new HashSet<EnemyAI>();
                 var phases = waveData.phases;
                 if (phases != null)
                 {
@@ -62,7 +62,7 @@ namespace _60SecondsSurvivors.Enemy
                 return;
 
             float interval = Mathf.Max(0.01f, waveInterval);
-            EnemyHealth prefab = enemyData?.prefab;
+            EnemyAI prefab = enemyData?.prefab;
             if (prefab == null) return;
 
             timer += Time.deltaTime;
@@ -73,7 +73,7 @@ namespace _60SecondsSurvivors.Enemy
             }
         }
 
-        private void TrySpawn(EnemyHealth prefab)
+        private void TrySpawn(EnemyAI prefab)
         {
             if (prefab == null) return;
 

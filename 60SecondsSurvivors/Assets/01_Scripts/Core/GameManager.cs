@@ -21,12 +21,18 @@ namespace _60SecondsSurvivors.Core
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         public void PrepareNewRun()
         {
             _isGameOver = false;
+            ScoreManager.Instance?.ResetRun();
         }
 
         public void OnPlayerDied()
@@ -34,7 +40,7 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
-            StartCoroutine(DelayedLoadResult(false));
+            StartCoroutine(DelayedLoadResult());
         }
 
         public void OnTimeOver()
@@ -42,13 +48,14 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
-            StartCoroutine(DelayedLoadResult(false));
+            StartCoroutine(DelayedLoadResult());
         }
 
-        private IEnumerator DelayedLoadResult(bool isWin)
+        private IEnumerator DelayedLoadResult()
         {
+            ScoreManager.Instance?.SaveHighScore();
             yield return new WaitForSeconds(3f);
-            SceneLoader.LoadResultScene(isWin);
+            SceneLoader.LoadResultScene();
         }
     }
 }

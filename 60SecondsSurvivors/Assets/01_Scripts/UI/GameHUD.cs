@@ -11,17 +11,29 @@ namespace _60SecondsSurvivors.UI
     {
         public static GameHUD Instance { get; private set; }
 
-        [SerializeField] private TimeManager timeManager;
+        [SerializeField] private TimeManager _timeManager;
 
-        [SerializeField] private TMP_Text timeText;
-        [SerializeField] private TMP_Text hpText;
-        [SerializeField] private Slider hpSlider;
+        [SerializeField] private TMP_Text _timeText;
 
-        [Header("Item Popup")]
-        [SerializeField] private TMP_Text itemText;
-        private Vector2 itemTextPosition;
-        private float pickupDuration = 0.9f;
-        private Vector2 pickupMove = new Vector2(0f, 40f);
+        [Header("HP")]
+        [SerializeField] private Slider _hpSlider;
+        [Tooltip("플레이어 월드 위치 기준 오프셋 (월드 단위), 플레이어 바로 아래")]
+        [SerializeField] private Vector3 _hpWorldOffset = new Vector3(0f, -1f, 0f);
+        [Tooltip("Canvas 내 UI 위치 추가 오프셋 (픽셀)")]
+        [SerializeField] private Vector2 _hpUiOffset = Vector2.zero;
+
+        [Header("Score")]
+        [SerializeField] private TMP_Text _scoreText;
+
+        [Header("Item Buff")]
+        [SerializeField] private TMP_Text _itemText;
+        private Vector2 _itemTextPosition;
+        private float _pickupDuration = 0.9f;
+        private Vector2 _pickupMove = new Vector2(0f, 40f);
+
+        private RectTransform _hpSliderRect;
+        private RectTransform _canvasRect;
+        private Camera _uiCamera;
 
         private void Awake()
         {
@@ -36,48 +48,85 @@ namespace _60SecondsSurvivors.UI
 
         private void Start()
         {
-            itemTextPosition = itemText.rectTransform.anchoredPosition;
+            if (_scoreText != null)
+                _scoreText.text = "SCORE: 0";
+
+            if (_itemText != null)
+                _itemTextPosition = _itemText.rectTransform.anchoredPosition;
+
+            if (_hpSlider != null)
+                _hpSliderRect = _hpSlider.GetComponent<RectTransform>();
+
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                _canvasRect = canvas.GetComponent<RectTransform>();
+                _uiCamera = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
+            }
         }
 
         private void Update()
         {
-            if (timeManager != null && timeText != null)
+            if (_timeManager != null && _timeText != null)
             {
-                timeText.text = $"TIME: {Mathf.CeilToInt(timeManager.RemainingTime)}";
+                _timeText.text = $"TIME: {Mathf.CeilToInt(_timeManager.RemainingTime)}";
             }
 
-            if (PlayerController.Instance != null && hpText != null)
+            if (PlayerController.Instance != null && _hpSlider != null)
             {
-                hpText.text = $"{PlayerController.Instance.CurrentHp}/{PlayerController.Instance.MaxHp}";
+                float cur = PlayerController.Instance.CurrentHp;
+                float max = PlayerController.Instance.MaxHp;
+                float value = max > 0f ? Mathf.Clamp01(cur / max) : 0f;
+                _hpSlider.value = value;
             }
 
-            if (PlayerController.Instance != null && hpSlider != null)
+            if (_scoreText != null)
             {
-                hpSlider.value = PlayerController.Instance.CurrentHp / PlayerController.Instance.MaxHp;
+                _scoreText.text = $"SCORE: {ScoreManager.Instance?.CurrentScore ?? 0}";
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            UpdateHpSliderPosition();
+        }
+
+        private void UpdateHpSliderPosition()
+        {
+            if (_hpSliderRect == null || _canvasRect == null || PlayerController.Instance == null)
+                return;
+
+            Vector3 worldPos = (Vector3)PlayerController.Instance.Position + _hpWorldOffset;
+
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(_uiCamera, worldPos);
+
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRect, screenPoint, _uiCamera, out var localPoint))
+            {
+                _hpSliderRect.anchoredPosition = localPoint + _hpUiOffset;
             }
         }
 
         public void ShowPickup(string text)
         {
-            if (itemText == null) return;
+            if (_itemText == null) return;
 
-            itemText.text = text;
-            itemText.alpha = 1f;
-            StartCoroutine(PopupRoutine(itemText));
+            _itemText.text = text;
+            _itemText.alpha = 1f;
+            StartCoroutine(PopupRoutine(_itemText));
         }
 
         private IEnumerator PopupRoutine(TMP_Text label)
         {
             float t = 0f;
-            Vector2 startPosition = label.rectTransform.anchoredPosition;
+            Vector2 start = label.rectTransform.anchoredPosition;
             Color baseColor = label.color;
 
-            while (t < pickupDuration)
+            while (t < _pickupDuration)
             {
                 t += Time.deltaTime;
-                float progress = t / pickupDuration;
+                float progress = t / _pickupDuration;
 
-                label.rectTransform.anchoredPosition = Vector2.Lerp(startPosition, startPosition + pickupMove, progress);
+                label.rectTransform.anchoredPosition = Vector2.Lerp(start, start + _pickupMove, progress);
 
                 float a = Mathf.Lerp(1f, 0f, progress);
                 label.color = new Color(baseColor.r, baseColor.g, baseColor.b, a);
@@ -87,8 +136,7 @@ namespace _60SecondsSurvivors.UI
 
             if (label != null)
             {
-                label.alpha = 0;
-                label.rectTransform.anchoredPosition = itemTextPosition;
+                label.rectTransform.anchoredPosition = _itemTextPosition;
             }
         }
     }

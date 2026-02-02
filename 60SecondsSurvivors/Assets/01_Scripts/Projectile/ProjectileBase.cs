@@ -1,6 +1,6 @@
-using _60SecondsSurvivors.Core;
-using _60SecondsSurvivors.Enemy;
 using UnityEngine;
+using _60SecondsSurvivors.Enemy;
+using _60SecondsSurvivors.Core;
 
 namespace _60SecondsSurvivors.Projectile
 {
@@ -12,6 +12,10 @@ namespace _60SecondsSurvivors.Projectile
         [SerializeField] private float lifeTime = 2f;
         [SerializeField] private int damage = 1;
         [SerializeField] private int pierce = 0; // 관통 수(0 = 관통 없음)
+
+        // 넉백 세팅 (프리팹 단위로 조절 가능)
+        [SerializeField] private float knockbackForce = 2f;
+        [SerializeField] private float knockbackDuration = 0.12f;
 
         private Vector2 direction = Vector2.right;
         private Rigidbody2D rigid;
@@ -29,7 +33,6 @@ namespace _60SecondsSurvivors.Projectile
 
         public void OnSpawned()
         {
-            // 풀에서 꺼낼 때 기본값으로 복원
             lifeTime = initialLifeTime;
             damage = initialDamage;
             pierce = initialPierce;
@@ -55,6 +58,13 @@ namespace _60SecondsSurvivors.Projectile
 
         private void FixedUpdate()
         {
+            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+            {
+                if (rigid != null)
+                    rigid.velocity = Vector2.zero;
+                return;
+            }
+
             if (rigid != null)
                 rigid.velocity = direction * speed;
         }
@@ -73,15 +83,19 @@ namespace _60SecondsSurvivors.Projectile
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            var enemyHealth = other.GetComponent<EnemyHealth>();
-            if (enemyHealth != null)
+            var enemyAI = other.GetComponent<EnemyAI>();
+            if (enemyAI != null)
             {
-                enemyHealth.TakeDamage(damage);
+                enemyAI.TakeDamage(damage);
+
+                if (enemyAI.isActiveAndEnabled)
+                {
+                    enemyAI.ApplyKnockback(transform.position, knockbackForce, knockbackDuration);
+                }
 
                 if (pierce > 0)
                 {
                     pierce--;
-                    // 관통 남음: 그대로 유지 (충돌한 적은 데미지 입고 투사체는 계속)
                     return;
                 }
 

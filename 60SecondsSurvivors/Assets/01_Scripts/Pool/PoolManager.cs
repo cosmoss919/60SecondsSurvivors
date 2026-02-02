@@ -6,9 +6,6 @@ using _60SecondsSurvivors.Item;
 
 namespace _60SecondsSurvivors.Core
 {
-    /// <summary>
-    /// 풀 매니저
-    /// </summary>
     public class PoolManager : MonoBehaviour
     {
         public static PoolManager Instance { get; private set; }
@@ -28,12 +25,21 @@ namespace _60SecondsSurvivors.Core
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         public void Preload(Component prefab, int count = -1)
         {
             if (prefab == null) return;
+
+            if (prefab is ItemBase)
+                return;
+
             int toCreate = count <= 0 ? defaultMaxPoolCount : count;
             EnsurePool(prefab);
 
@@ -52,10 +58,9 @@ namespace _60SecondsSurvivors.Core
             }
         }
 
-        public GameObject GetFromPool(Component prefab) 
+        public GameObject GetFromPool(Component prefab)
         {
             if (prefab == null) return null;
-
             EnsurePool(prefab);
 
             Queue<GameObject> pool = pools[prefab];
@@ -67,7 +72,6 @@ namespace _60SecondsSurvivors.Core
                 go.SetActive(true);
                 instanceToPrefab[go] = prefab;
 
-                // 부모를 용도에 맞는 폴더 아래로 재설정
                 go.transform.SetParent(parent, false);
 
                 var poolable = go.GetComponent<IPoolable>();
@@ -86,7 +90,6 @@ namespace _60SecondsSurvivors.Core
                 createdCounts[prefab] = created + 1;
                 go.SetActive(true);
 
-                // 생성 시 용도에 맞는 부모 아래로 둠
                 go.transform.SetParent(parent, false);
 
                 var poolable = go.GetComponent<IPoolable>();
@@ -108,11 +111,21 @@ namespace _60SecondsSurvivors.Core
                 return;
             }
 
+            // Item은 풀에 다시 넣지 않고 단순 비활성화 및 정리만 수행
+            if (prefab is ItemBase)
+            {
+                Transform parent = GetPoolParent(prefab);
+                go.transform.SetParent(parent, false);
+                go.SetActive(false);
+                // instanceToPrefab는 유지해도 무방
+                return;
+            }
+
             EnsurePool(prefab);
 
-            // 반환 시에도 올바른 부모(포폴더) 아래로 정리
-            Transform parent = GetPoolParent(prefab);
-            go.transform.SetParent(parent, false);
+            // 반환 시에도 올바른 부모(폴더) 아래로 정리
+            Transform parentPool = GetPoolParent(prefab);
+            go.transform.SetParent(parentPool, false);
 
             go.SetActive(false);
             pools[prefab].Enqueue(go);
@@ -131,28 +144,24 @@ namespace _60SecondsSurvivors.Core
             }
         }
 
-        // prefab 타입에 따라 프로젝트 뷰에서 보기 좋도록 부모(루트/종류별 폴더)를 리턴
         private Transform GetPoolParent(Component prefab)
         {
             string rootName;
-            if (prefab is EnemyHealth)
+            if (prefab is EnemyAI)
                 rootName = "Enemies";
             else if (prefab is ProjectileBase)
                 rootName = "Weapons";
-            else if(prefab is ItemBase)
+            else if (prefab is ItemBase)
                 rootName = "Items";
             else
                 rootName = "Pooled";
 
-            // 루트 오브젝트 찾거나 생성
             GameObject root = GameObject.Find(rootName);
             if (root == null)
             {
                 root = new GameObject(rootName);
-                DontDestroyOnLoad(root);
             }
 
-            // prefab 별 서브 폴더(예: Enemies/Slime)
             string childName = prefab.gameObject.name;
             Transform child = root.transform.Find(childName);
             if (child == null)

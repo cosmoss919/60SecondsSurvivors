@@ -2,11 +2,11 @@ namespace _60SecondsSurvivors.Core
 {
     public static class GameResult
     {
-        public static bool IsWin { get; private set; }
+        public static int Score { get; private set; }
 
-        public static void Set(bool isWin)
+        public static void Set(int score)
         {
-            IsWin = isWin;
+            Score = score;
         }
     }
 }

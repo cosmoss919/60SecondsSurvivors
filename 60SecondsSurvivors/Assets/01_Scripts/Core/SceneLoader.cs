@@ -25,9 +25,9 @@ namespace _60SecondsSurvivors.Core
             SceneManager.LoadScene(GameSceneName);
         }
 
-        public static void LoadResultScene(bool isWin)
+        public static void LoadResultScene()
         {
-            GameResult.Set(isWin);
+            GameResult.Set(ScoreManager.Instance.CurrentScore);
             SceneManager.LoadScene(ResultSceneName);
         }
     }
