@@ -31,7 +31,7 @@ namespace _60SecondsSurvivors.Data
             [Tooltip("단일 적, enemies가 비어있으면 이 값을 사용")]
             public EnemyData enemy;
 
-            [Tooltip("여러 적을 랜덤 스폰하고 싶으면 여기에 넣으세요(가중치).")]
+            [Tooltip("여러 적을 랜덤 스폰하고 싶으면 여기에 넣으세요(가중치)")]
             public WeightedEnemy[] enemies;
         }
 

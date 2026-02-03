@@ -68,21 +68,18 @@ namespace _60SecondsSurvivors.UI
             if (ScoreManager.Instance != null)
             {
                 ScoreManager.Instance.OnScoreChanged += HandleScoreChanged;
-                // 초기 표시
                 scoreText.text = $"SCORE: {ScoreManager.Instance.CurrentScore}";
             }
 
             if (timeManager != null)
             {
                 timeManager.OnSecondTick += HandleSecondTick;
-                // 초기 표시
                 timeText.text = $"TIME: {Mathf.CeilToInt(timeManager.RemainingTime)}";
             }
 
             if (PlayerController.Instance != null && hpSlider != null)
             {
                 PlayerController.Instance.OnHpChanged += HandleHpChanged;
-                // 초기 표시
                 hpSlider.value = PlayerController.Instance.CurrentHp / PlayerController.Instance.MaxHp;
             }
         }

@@ -17,7 +17,6 @@ namespace _60SecondsSurvivors.Core
         public float RemainingTime => remainingTime;
         public float ElapsedTime => Mathf.Max(0f, gameDuration - remainingTime);
 
-        // 이벤트: 초 단위가 바뀔 때 호출 (남은 초)
         public event Action<int> OnSecondTick;
 
         private int _lastReportedSecond = -1;

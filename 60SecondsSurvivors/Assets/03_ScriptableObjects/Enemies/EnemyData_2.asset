@@ -18,4 +18,4 @@ MonoBehaviour:
   contactDamage: 2
   damageTick: 1
   score: 15
-  dropChance: 0.5
+  dropChance: 1

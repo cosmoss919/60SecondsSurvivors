@@ -19715,7 +19715,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 369d1dcce003fcf4eb2043e86975618e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameDuration: 60
+  gameDuration: 60
 --- !u!4 &1267707177
 Transform:
   m_ObjectHideFlags: 0
@@ -19762,6 +19762,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeManager: {fileID: 1267707176}
   waveData: {fileID: 11400000, guid: 5419bac18896ee545ba3087548e75701, type: 2}
+  spawnDistanceX: 10
+  spawnDistanceY: 10
 --- !u!4 &1306089982
 Transform:
   m_ObjectHideFlags: 0
@@ -19831,13 +19833,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061e875bcce06a042a241e7a3613120d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _timeManager: {fileID: 1267707176}
-  _timeText: {fileID: 2017860054}
-  _hpSlider: {fileID: 1442119439}
-  _hpWorldOffset: {x: 0, y: -1, z: 0}
-  _hpUiOffset: {x: 0, y: 0}
-  _scoreText: {fileID: 2016058447}
-  _itemText: {fileID: 708021489}
+  timeManager: {fileID: 1267707176}
+  timeText: {fileID: 2017860054}
+  hpSlider: {fileID: 1442119439}
+  hpWorldOffset: {x: 0, y: -1, z: 0}
+  hpUiOffset: {x: 0, y: 0}
+  scoreText: {fileID: 2016058447}
+  itemText: {fileID: 708021489}
 --- !u!222 &1382882050
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -39496,6 +39498,10 @@ PrefabInstance:
       propertyPath: maxHp
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 3415246564687945145, guid: 30b9f1c8b1bd6664a8ccea65e5fdd708, type: 3}
+      propertyPath: joystick
+      value: 
+      objectReference: {fileID: 483048421}
     - target: {fileID: 3415246564687945145, guid: 30b9f1c8b1bd6664a8ccea65e5fdd708, type: 3}
       propertyPath: _joystick
       value: 

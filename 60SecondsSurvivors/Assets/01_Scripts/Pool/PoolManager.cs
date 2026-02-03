@@ -121,7 +121,6 @@ namespace _60SecondsSurvivors.Core
 
             EnsurePool(prefab);
 
-            // 반환 시에도 올바른 부모(폴더) 아래로 정리
             Transform parentPool = GetPoolParent(prefab);
             go.transform.SetParent(parentPool, false);
 
