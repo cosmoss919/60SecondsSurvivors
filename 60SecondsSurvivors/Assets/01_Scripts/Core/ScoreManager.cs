@@ -10,13 +10,13 @@ namespace _60SecondsSurvivors.Core
     {
         public static ScoreManager Instance { get; private set; }
 
-        private int _currentScore;
-        private int _highScore;
+        private int currentScore;
+        private int highScore;
 
         private const string PrefKeyHighScore = "60SS_HighScore";
 
-        public int CurrentScore => _currentScore;
-        public int HighScore => _highScore;
+        public int CurrentScore => currentScore;
+        public int HighScore => highScore;
 
         public event Action<int> OnScoreChanged;
 
@@ -29,8 +29,8 @@ namespace _60SecondsSurvivors.Core
             }
 
             Instance = this;
-            _highScore = PlayerPrefs.GetInt(PrefKeyHighScore, 0);
-            _currentScore = 0;
+            highScore = PlayerPrefs.GetInt(PrefKeyHighScore, 0);
+            currentScore = 0;
         }
 
         private void OnDestroy()
@@ -41,23 +41,23 @@ namespace _60SecondsSurvivors.Core
 
         public void ResetRun()
         {
-            _currentScore = 0;
-            OnScoreChanged?.Invoke(_currentScore);
+            currentScore = 0;
+            OnScoreChanged?.Invoke(currentScore);
         }
 
         public void AddScore(int amount)
         {
             if (amount <= 0) return;
-            _currentScore += amount;
-            OnScoreChanged?.Invoke(_currentScore);
+            currentScore += amount;
+            OnScoreChanged?.Invoke(currentScore);
         }
 
         public void SaveHighScore()
         {
-            if (_currentScore > _highScore)
+            if (currentScore > highScore)
             {
-                _highScore = _currentScore;
-                PlayerPrefs.SetInt(PrefKeyHighScore, _highScore);
+                highScore = currentScore;
+                PlayerPrefs.SetInt(PrefKeyHighScore, highScore);
                 PlayerPrefs.Save();
             }
         }

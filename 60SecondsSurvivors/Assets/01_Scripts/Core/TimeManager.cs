@@ -8,14 +8,14 @@ namespace _60SecondsSurvivors.Core
     /// </summary>
     public class TimeManager : MonoBehaviour
     {
-        [SerializeField] private float _gameDuration = 60f;
+        [SerializeField] private float gameDuration = 60f;
 
-        private float _remainingTime;
-        private bool _isRunning;
+        private float remainingTime;
+        private bool isRunning;
 
-        public float GameDuration => _gameDuration;
-        public float RemainingTime => _remainingTime;
-        public float ElapsedTime => Mathf.Max(0f, _gameDuration - _remainingTime);
+        public float GameDuration => gameDuration;
+        public float RemainingTime => remainingTime;
+        public float ElapsedTime => Mathf.Max(0f, gameDuration - remainingTime);
 
         // 이벤트: 초 단위가 바뀔 때 호출 (남은 초)
         public event Action<int> OnSecondTick;
@@ -29,10 +29,9 @@ namespace _60SecondsSurvivors.Core
 
         public void StartTimer()
         {
-            _remainingTime = _gameDuration;
-            _isRunning = true;
-            // 초기 리포트
-            _lastReportedSecond = Mathf.CeilToInt(_remainingTime);
+            remainingTime = gameDuration;
+            isRunning = true;
+            _lastReportedSecond = Mathf.CeilToInt(remainingTime);
             OnSecondTick?.Invoke(_lastReportedSecond);
         }
 
@@ -41,22 +40,22 @@ namespace _60SecondsSurvivors.Core
             if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
                 return;
 
-            if (!_isRunning) return;
+            if (!isRunning) return;
 
-            _remainingTime -= Time.deltaTime;
-            if (_remainingTime < 0f) _remainingTime = 0f;
+            remainingTime -= Time.deltaTime;
+            if (remainingTime < 0f) remainingTime = 0f;
 
-            int currentSecond = Mathf.CeilToInt(_remainingTime);
+            int currentSecond = Mathf.CeilToInt(remainingTime);
             if (currentSecond != _lastReportedSecond)
             {
                 _lastReportedSecond = currentSecond;
                 OnSecondTick?.Invoke(currentSecond);
             }
 
-            if (_remainingTime <= 0f)
+            if (remainingTime <= 0f)
             {
-                _remainingTime = 0f;
-                _isRunning = false;
+                remainingTime = 0f;
+                isRunning = false;
 
                 if (GameManager.Instance != null)
                 {

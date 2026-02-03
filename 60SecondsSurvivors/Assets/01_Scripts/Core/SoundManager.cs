@@ -35,7 +35,6 @@ namespace _60SecondsSurvivors.Core
         private Coroutine _musicFadeCoroutine;
         private AudioClip _currentMusicClip;
 
-        // persistent keys
         private const string PrefKeyMusicVolume = "60SS_MusicVolume";
         private const string PrefKeySfxVolume = "60SS_SfxVolume";
         private const string PrefKeyMusicMuted = "60SS_MusicMuted";

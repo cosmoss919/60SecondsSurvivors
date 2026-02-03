@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace _60SecondsSurvivors.Core
 {
-    /// <summary>
-    /// 전체 게임 흐름을 관리하는 매니저
-    /// </summary>
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }

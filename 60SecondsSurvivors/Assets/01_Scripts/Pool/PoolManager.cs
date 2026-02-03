@@ -111,13 +111,11 @@ namespace _60SecondsSurvivors.Core
                 return;
             }
 
-            // Item은 풀에 다시 넣지 않고 단순 비활성화 및 정리만 수행
             if (prefab is ItemBase)
             {
                 Transform parent = GetPoolParent(prefab);
                 go.transform.SetParent(parent, false);
                 go.SetActive(false);
-                // instanceToPrefab는 유지해도 무방
                 return;
             }
 

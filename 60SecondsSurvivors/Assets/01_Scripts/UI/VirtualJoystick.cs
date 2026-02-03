@@ -7,7 +7,7 @@ namespace _60SecondsSurvivors.UI
     {
         [SerializeField] private RectTransform background;
         [SerializeField] private RectTransform handle;
-        [SerializeField] private float handleRange = 50f; // 핸들이 움직일 최대 픽셀 반경
+        [SerializeField] private float handleRange = 50f;
         [SerializeField, Range(0f, 1f)] private float deadZone = 0.1f;
         private bool hideWhenIdle = true;
 

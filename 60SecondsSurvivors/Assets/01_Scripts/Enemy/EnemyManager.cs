@@ -55,7 +55,6 @@ namespace _60SecondsSurvivors.Enemy
             float bestSq = float.MaxValue;
             float maxSq = (maxDistance > 0f) ? maxDistance * maxDistance : float.MaxValue;
 
-            // 단순 선형 탐색(효율성: 적 수가 매우 많아지면 공간 색인 고려)
             for (int i = 0; i < _enemies.Count; i++)
             {
                 var e = _enemies[i];

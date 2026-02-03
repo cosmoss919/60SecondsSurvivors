@@ -11,9 +11,8 @@ namespace _60SecondsSurvivors.Projectile
         [SerializeField] private float speed = 10f;
         [SerializeField] private float lifeTime = 2f;
         [SerializeField] private int damage = 1;
-        [SerializeField] private int pierce = 0; // 관통 수(0 = 관통 없음)
+        [SerializeField] private int pierce = 0; 
 
-        // 넉백 세팅 (프리팹 단위로 조절 가능)
         [SerializeField] private float knockbackForce = 2f;
         [SerializeField] private float knockbackDuration = 0.12f;
 
@@ -23,7 +22,6 @@ namespace _60SecondsSurvivors.Projectile
         private int initialDamage;
         private int initialPierce;
 
-        // Job 기반 이동 사용 여부 (기본: true)
         [SerializeField] private bool useJobMovement = true;
 
         private void Awake()
@@ -42,14 +40,12 @@ namespace _60SecondsSurvivors.Projectile
             if (rigid != null && !useJobMovement)
                 rigid.velocity = Vector2.zero;
 
-            // Register to mover if available and using job movement
             if (useJobMovement && ProjectileMover.Instance != null)
                 ProjectileMover.Instance.Register(this);
         }
 
         private void OnDisable()
         {
-            // Unregister from mover
             if (useJobMovement && ProjectileMover.Instance != null)
                 ProjectileMover.Instance.Unregister(this);
         }
@@ -66,7 +62,6 @@ namespace _60SecondsSurvivors.Projectile
                 this.direction = direction.normalized;
         }
 
-        // 외부(ProjectileMover)에서 읽을 수 있도록 velocity 반환
         public Vector3 GetVelocity()
         {
             return (Vector3)direction * speed;
@@ -84,7 +79,6 @@ namespace _60SecondsSurvivors.Projectile
 
         private void FixedUpdate()
         {
-            // 기존 물리 이동은 사용하지 않음 when job mover present
             if (useJobMovement && ProjectileMover.Instance != null)
             {
                 if (rigid != null)

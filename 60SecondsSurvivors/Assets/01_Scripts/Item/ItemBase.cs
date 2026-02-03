@@ -68,7 +68,7 @@ namespace _60SecondsSurvivors.Item
             switch (type)
             {
                 case ItemType.FireRate:
-                    weapon?.MultiplyFireRate(1f - fValue); // 발사 속도 증가(감소 값 적용)
+                    weapon?.MultiplyFireRate(1f - fValue);
                     popupText = $"발사속도 +{Mathf.RoundToInt(fValue * 100f)}%";
                     break;
                 case ItemType.Damage:

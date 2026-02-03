@@ -9,8 +9,8 @@ namespace _60SecondsSurvivors.Enemy
     public class EnemyAI : MonoBehaviour
     {
         private Animator animator;
-        private int _maxHp;
-        private int _currentHp;
+        private int maxHp;
+        private int currentHp;
 
         private float moveSpeed;
         private int damage;
@@ -19,15 +19,15 @@ namespace _60SecondsSurvivors.Enemy
         private Transform target;
         private Rigidbody2D rigid;
         private SpriteRenderer spriteRenderer;
-        private Coroutine _knockbackRoutine;
+        private Coroutine knockbackRoutine;
         private EnemyBase enemyBase;
-        private Collider2D _collider;
+        private Collider2D coll;
 
-        private EnemyState _state = EnemyState.Alive;
+        private EnemyState state = EnemyState.Alive;
 
         public bool IsStunned { get; private set; }
-        public bool IsAlive => _state == EnemyState.Alive;
-        public bool IsDead => _state == EnemyState.Dead;
+        public bool IsAlive => state == EnemyState.Alive;
+        public bool IsDead => state == EnemyState.Dead;
 
         private enum EnemyState
         {
@@ -48,13 +48,13 @@ namespace _60SecondsSurvivors.Enemy
             animator = GetComponent<Animator>();
             rigid = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
-            _collider = GetComponent<Collider2D>();
+            coll = GetComponent<Collider2D>();
 
             moveSpeed = enemyBase.Data.moveSpeed;
             damage = enemyBase.Data.contactDamage;
             damageTick = enemyBase.Data.damageTick;
-            _maxHp = enemyBase.Data.maxHp;
-            _currentHp = _maxHp;
+            maxHp = enemyBase.Data.maxHp;
+            currentHp = maxHp;
         }
 
         private void Start()
@@ -67,11 +67,11 @@ namespace _60SecondsSurvivors.Enemy
         }
         public void OnEnable()
         {
-            _currentHp = _maxHp;
-            _state = EnemyState.Alive;
+            currentHp = maxHp;
+            state = EnemyState.Alive;
             IsStunned = false;
 
-            if (_collider != null) _collider.enabled = true;
+            if (coll != null) coll.enabled = true;
 
             if (animator != null)
             {
@@ -79,7 +79,6 @@ namespace _60SecondsSurvivors.Enemy
                 animator.SetBool("Dead", false);
             }
 
-            // EnemyManager에 등록 (자동 생성 지원)
             EnemyManager.EnsureExists().Register(this);
         }
 
@@ -142,23 +141,23 @@ namespace _60SecondsSurvivors.Enemy
             if (animator != null)
                 animator.SetTrigger("Hit");
 
-            _currentHp -= amount;
+            currentHp -= amount;
 
-            if (_currentHp <= 0)
+            if (currentHp <= 0)
             {
-                _currentHp = 0;
-                _state = EnemyState.Dead;
+                currentHp = 0;
+                state = EnemyState.Dead;
                 StartCoroutine(Die());
             }
         }
 
         private IEnumerator Die()
         {
-            _state = EnemyState.Dead;
+            state = EnemyState.Dead;
             IsStunned = false;
 
-            if (_collider != null)
-                _collider.enabled = false;
+            if (coll != null)
+                coll.enabled = false;
 
             if (animator != null)
                 animator.SetBool("Dead", true);
@@ -177,10 +176,10 @@ namespace _60SecondsSurvivors.Enemy
             if (!IsAlive) return;
 
             Vector2 dir = ((Vector2)transform.position - sourcePos).normalized;
-            if (_knockbackRoutine != null)
-                StopCoroutine(_knockbackRoutine);
+            if (knockbackRoutine != null)
+                StopCoroutine(knockbackRoutine);
 
-            _knockbackRoutine = StartCoroutine(KnockbackRoutine(dir, force, duration));
+            knockbackRoutine = StartCoroutine(KnockbackRoutine(dir, force, duration));
         }
 
         private IEnumerator KnockbackRoutine(Vector2 dir, float force, float duration)
@@ -202,7 +201,7 @@ namespace _60SecondsSurvivors.Enemy
             }
 
             IsStunned = false;
-            _knockbackRoutine = null;
+            knockbackRoutine = null;
         }
 
         private void OnDisable()
@@ -210,13 +209,13 @@ namespace _60SecondsSurvivors.Enemy
             if (EnemyManager.Instance != null)
                 EnemyManager.Instance.Unregister(this);
 
-            if (_knockbackRoutine != null)
+            if (knockbackRoutine != null)
             {
-                StopCoroutine(_knockbackRoutine);
-                _knockbackRoutine = null;
+                StopCoroutine(knockbackRoutine);
+                knockbackRoutine = null;
             }
             IsStunned = false;
-            _state = EnemyState.Alive;
+            state = EnemyState.Alive;
         }
     }
 }

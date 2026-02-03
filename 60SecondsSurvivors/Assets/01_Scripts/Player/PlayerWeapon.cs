@@ -20,9 +20,8 @@ namespace _60SecondsSurvivors.Player
 
         [Header("Aim Optimization")]
         [SerializeField, Range(1, 30)]
-        private int aimUpdateFrequency = 4; // 몇 프레임마다 한 번 조준할지
-        [SerializeField] private float aimMaxDistance = 30f; // 조준 허용 최대 거리(음수이면 제한 없음)
-
+        private int aimUpdateFrequency = 4; 
+        [SerializeField] private float aimMaxDistance = 30f;
         private int _aimFrameCounter;
 
         private void Update()

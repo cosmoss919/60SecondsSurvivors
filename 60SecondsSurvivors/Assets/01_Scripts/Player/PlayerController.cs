@@ -17,7 +17,7 @@ namespace _60SecondsSurvivors.Player
 
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float maxHp = 100;
-        [SerializeField] private VirtualJoystick _joystick;
+        [SerializeField] private VirtualJoystick joystick;
 
         private float hitFlashDuration = 0.2f;
         private float currentHp;
@@ -27,17 +27,13 @@ namespace _60SecondsSurvivors.Player
         private Material material;
         private Vector2 inputVec;
 
-        // 무적 상태
         private bool isInvincible;
         private Coroutine invincibleRoutine;
 
-        // 피격 플래시 코루틴 참조
         private Coroutine hitFlashRoutine;
 
-        // 접촉 데미지 코루틴 관리 (적별로 코루틴 유지)
-        private readonly Dictionary<GameObject, Coroutine> _contactCoroutines = new();
+        private readonly Dictionary<GameObject, Coroutine> contactCoroutines = new();
 
-        // 이벤트: HP 변경 시 호출 (current, max)
         public event Action<int, int> OnHpChanged;
 
         private void Awake()
@@ -59,16 +55,14 @@ namespace _60SecondsSurvivors.Player
             }
             Instance = this;
 
-            // 초기 HP 알림
             OnHpChanged?.Invoke((int)currentHp, (int)maxHp);
         }
 
         private void Update()
         {
-            // 게임 오버이면 모든 입력/이동/접촉 데미지 중지 (애니메이션은 계속 재생)
-            if (_joystick != null && _joystick.Direction != Vector2.zero)
+            if (joystick != null && joystick.Direction != Vector2.zero)
             {
-                inputVec = _joystick.Direction;
+                inputVec = joystick.Direction;
             }
             else
             {
@@ -110,7 +104,6 @@ namespace _60SecondsSurvivors.Player
             currentHp -= amount;
             if (currentHp < 0) currentHp = 0;
 
-            // HP 변경 알림
             OnHpChanged?.Invoke((int)currentHp, (int)maxHp);
 
             StartHitFlash();
@@ -199,12 +192,12 @@ namespace _60SecondsSurvivors.Player
                 GameManager.Instance.OnPlayerDied();
             }
 
-            foreach (var kv in _contactCoroutines)
+            foreach (var kv in contactCoroutines)
             {
                 if (kv.Value != null)
                     StopCoroutine(kv.Value);
             }
-            _contactCoroutines.Clear();
+            contactCoroutines.Clear();
 
             animator.SetTrigger("Dead");
             rigid.velocity = Vector2.zero;
@@ -215,20 +208,20 @@ namespace _60SecondsSurvivors.Player
         public void StartContactDamage(GameObject enemySource, int damage, float tick)
         {
             if (enemySource == null) return;
-            if (_contactCoroutines.ContainsKey(enemySource)) return;
+            if (contactCoroutines.ContainsKey(enemySource)) return;
 
             Coroutine c = StartCoroutine(ContactDamageCoroutine(enemySource, damage, tick));
-            _contactCoroutines[enemySource] = c;
+            contactCoroutines[enemySource] = c;
         }
 
         public void StopContactDamage(GameObject enemySource)
         {
             if (enemySource == null) return;
-            if (_contactCoroutines.TryGetValue(enemySource, out var c))
+            if (contactCoroutines.TryGetValue(enemySource, out var c))
             {
                 if (c != null)
                     StopCoroutine(c);
-                _contactCoroutines.Remove(enemySource);
+                contactCoroutines.Remove(enemySource);
             }
         }
 
@@ -250,7 +243,7 @@ namespace _60SecondsSurvivors.Player
                 TakeDamage(damage);
             }
 
-            _contactCoroutines.Remove(source);
+            contactCoroutines.Remove(source);
         }
 
         private void OnDestroy()

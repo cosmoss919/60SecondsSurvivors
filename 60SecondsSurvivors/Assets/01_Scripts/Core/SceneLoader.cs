@@ -2,9 +2,6 @@ using UnityEngine.SceneManagement;
 
 namespace _60SecondsSurvivors.Core
 {
-    /// <summary>
-    /// 씬 전환 매니저
-    /// </summary>
     public static class SceneLoader
     {
         private const string TitleSceneName = "TitleScene";
