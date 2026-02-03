@@ -78,6 +78,9 @@ namespace _60SecondsSurvivors.Enemy
                 animator.ResetTrigger("Hit");
                 animator.SetBool("Dead", false);
             }
+
+            // EnemyManager에 등록 (자동 생성 지원)
+            EnemyManager.EnsureExists().Register(this);
         }
 
         private void FixedUpdate()
@@ -204,6 +207,9 @@ namespace _60SecondsSurvivors.Enemy
 
         private void OnDisable()
         {
+            if (EnemyManager.Instance != null)
+                EnemyManager.Instance.Unregister(this);
+
             if (_knockbackRoutine != null)
             {
                 StopCoroutine(_knockbackRoutine);

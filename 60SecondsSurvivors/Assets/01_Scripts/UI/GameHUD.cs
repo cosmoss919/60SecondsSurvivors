@@ -63,26 +63,63 @@ namespace _60SecondsSurvivors.UI
                 _canvasRect = canvas.GetComponent<RectTransform>();
                 _uiCamera = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
             }
-        }
 
-        private void Update()
-        {
-            if (_timeManager != null && _timeText != null)
+            // 이벤트 구독
+            if (ScoreManager.Instance != null)
             {
+                ScoreManager.Instance.OnScoreChanged += HandleScoreChanged;
+                // 초기 표시
+                _scoreText.text = $"SCORE: {ScoreManager.Instance.CurrentScore}";
+            }
+
+            if (_timeManager != null)
+            {
+                _timeManager.OnSecondTick += HandleSecondTick;
+                // 초기 표시
                 _timeText.text = $"TIME: {Mathf.CeilToInt(_timeManager.RemainingTime)}";
             }
 
             if (PlayerController.Instance != null && _hpSlider != null)
             {
-                float cur = PlayerController.Instance.CurrentHp;
-                float max = PlayerController.Instance.MaxHp;
-                float value = max > 0f ? Mathf.Clamp01(cur / max) : 0f;
-                _hpSlider.value = value;
+                PlayerController.Instance.OnHpChanged += HandleHpChanged;
+                // 초기 표시
+                _hpSlider.value = PlayerController.Instance.CurrentHp / PlayerController.Instance.MaxHp;
             }
+        }
 
+        private void OnDestroy()
+        {
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.OnScoreChanged -= HandleScoreChanged;
+
+            if (_timeManager != null)
+                _timeManager.OnSecondTick -= HandleSecondTick;
+
+            if (PlayerController.Instance != null)
+                PlayerController.Instance.OnHpChanged -= HandleHpChanged;
+        }
+
+        private void HandleScoreChanged(int newScore)
+        {
             if (_scoreText != null)
             {
-                _scoreText.text = $"SCORE: {ScoreManager.Instance?.CurrentScore ?? 0}";
+                _scoreText.text = $"SCORE: {newScore}";
+            }
+        }
+
+        private void HandleSecondTick(int secondsRemaining)
+        {
+            if (_timeText != null)
+            {
+                _timeText.text = $"TIME: {secondsRemaining}";
+            }
+        }
+
+        private void HandleHpChanged(int cur, int max)
+        {
+            if (_hpSlider != null)
+            {
+                _hpSlider.value = max > 0 ? (float)cur / max : 0f;
             }
         }
 

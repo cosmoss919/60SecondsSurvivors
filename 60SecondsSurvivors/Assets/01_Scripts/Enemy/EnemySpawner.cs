@@ -11,10 +11,12 @@ namespace _60SecondsSurvivors.Enemy
         [SerializeField] private TimeManager timeManager;
         [SerializeField] private WaveData waveData;
 
-        private float spawnDistanceX = 10f;
-        private float spawnDistanceY = 10f;
+        [SerializeField] private float spawnDistanceX = 10f;
+        [SerializeField] private float spawnDistanceY = 10f;
 
-        private float timer;
+        private float spawnTimer;
+        private float nextSpawnInterval = -1f;
+        private EnemyAI nextPrefab;
 
         private void Start()
         {
@@ -58,18 +60,39 @@ namespace _60SecondsSurvivors.Enemy
             if (waveData == null || timeManager == null)
                 return;
 
-            if (!waveData.TryPickEnemy(timeManager.ElapsedTime, out var enemyData, out var waveInterval))
+            spawnTimer += Time.deltaTime;
+
+            if (spawnTimer < 0.01f)
                 return;
 
-            float interval = Mathf.Max(0.01f, waveInterval);
-            EnemyAI prefab = enemyData?.prefab;
-            if (prefab == null) return;
-
-            timer += Time.deltaTime;
-            if (timer >= interval)
+            while (true)
             {
-                timer = 0f;
-                TrySpawn(prefab);
+                if (nextSpawnInterval <= 0f)
+                {
+                    if (!waveData.TryPickEnemy(timeManager.ElapsedTime, out var enemyData, out var waveInterval))
+                    {
+                        break;
+                    }
+
+                    nextSpawnInterval = Mathf.Max(0.01f, waveInterval);
+                    nextPrefab = enemyData?.prefab;
+                }
+
+                if (spawnTimer < nextSpawnInterval)
+                    break;
+
+                spawnTimer -= nextSpawnInterval;
+
+                var prefabToSpawn = nextPrefab;
+
+                nextSpawnInterval = -1f;
+                nextPrefab = null;
+
+                if (prefabToSpawn == null) 
+                    continue;
+
+                TrySpawn(prefabToSpawn);
+
             }
         }
 
@@ -90,7 +113,7 @@ namespace _60SecondsSurvivors.Enemy
             var go = PoolManager.Instance != null ? PoolManager.Instance.GetFromPool(prefab) : Instantiate(prefab.gameObject);
             if (go == null) return;
 
-            go.transform.Translate(spawnPos);
+            go.transform.position = spawnPos;
             go.transform.rotation = Quaternion.identity;
         }
     }

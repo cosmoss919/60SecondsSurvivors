@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace _60SecondsSurvivors.Core
@@ -17,6 +18,8 @@ namespace _60SecondsSurvivors.Core
         public int CurrentScore => _currentScore;
         public int HighScore => _highScore;
 
+        public event Action<int> OnScoreChanged;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -34,17 +37,19 @@ namespace _60SecondsSurvivors.Core
         {
             if (Instance == this)
                 Instance = null;
-        }   
+        }
 
         public void ResetRun()
         {
             _currentScore = 0;
+            OnScoreChanged?.Invoke(_currentScore);
         }
 
         public void AddScore(int amount)
         {
             if (amount <= 0) return;
             _currentScore += amount;
+            OnScoreChanged?.Invoke(_currentScore);
         }
 
         public void SaveHighScore()

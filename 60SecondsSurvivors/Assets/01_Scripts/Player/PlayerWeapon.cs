@@ -15,15 +15,27 @@ namespace _60SecondsSurvivors.Player
         // 버프 상태
         private float damageMultiplier = 1f;
         private float fireRateMultiplier = 1f;
-        private int extraProjectiles = 100;
+        private int extraProjectiles = 0;
         private int pierceCount = 0;
+
+        [Header("Aim Optimization")]
+        [SerializeField, Range(1, 30)]
+        private int aimUpdateFrequency = 4; // 몇 프레임마다 한 번 조준할지
+        [SerializeField] private float aimMaxDistance = 30f; // 조준 허용 최대 거리(음수이면 제한 없음)
+
+        private int _aimFrameCounter;
 
         private void Update()
         {
             if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
                 return;
 
-            UpdateAimToNearestEnemy();
+            _aimFrameCounter++;
+            if (_aimFrameCounter >= aimUpdateFrequency)
+            {
+                _aimFrameCounter = 0;
+                UpdateAimToNearestEnemy();
+            }
 
             timer += Time.deltaTime;
             if (timer >= fireInterval * fireRateMultiplier)
@@ -35,32 +47,16 @@ namespace _60SecondsSurvivors.Player
 
         private void UpdateAimToNearestEnemy()
         {
-            var ais = FindObjectsOfType<EnemyAI>();
+            var manager = EnemyManager.Instance ?? EnemyManager.EnsureExists();
+            if (manager == null) return;
+
             Vector2 selfPos = transform.position;
-            EnemyAI nearestAI = null;
-            float bestDistSq = float.MaxValue;
-
-            for (int i = 0; i < ais.Length; i++)
+            var nearest = manager.GetNearest(selfPos, aimMaxDistance);
+            if (nearest != null)
             {
-                var ai = ais[i];
-                if (ai == null || !ai.gameObject.activeInHierarchy) continue;
-                if (!ai.IsAlive) continue;
-
-                Vector2 ePos = ai.transform.position;
-                float distSq = (ePos - selfPos).sqrMagnitude;
-                if (distSq < bestDistSq)
-                {
-                    bestDistSq = distSq;
-                    nearestAI = ai;
-                }
-            }
-
-            if (nearestAI != null)
-            {
-                Vector2 dir = (nearestAI.transform.position - transform.position);
+                Vector2 dir = (nearest.transform.position - transform.position);
                 if (dir == Vector2.zero) dir = Vector2.right;
                 lastDirection = dir.normalized;
-                return;
             }
         }
 

@@ -1,7 +1,8 @@
-using _60SecondsSurvivors.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using _60SecondsSurvivors.Core;
 using _60SecondsSurvivors.UI;
 
 namespace _60SecondsSurvivors.Player
@@ -36,13 +37,15 @@ namespace _60SecondsSurvivors.Player
         // 접촉 데미지 코루틴 관리 (적별로 코루틴 유지)
         private readonly Dictionary<GameObject, Coroutine> _contactCoroutines = new();
 
+        // 이벤트: HP 변경 시 호출 (current, max)
+        public event Action<int, int> OnHpChanged;
+
         private void Awake()
         {
-            currentHp = maxHp;
+            currentHp = (int)maxHp;
             animator = GetComponent<Animator>();
             rigid = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
-            animator = GetComponent<Animator>();
 
             if (spriteRenderer != null)
             {
@@ -55,31 +58,14 @@ namespace _60SecondsSurvivors.Player
                 return;
             }
             Instance = this;
+
+            // 초기 HP 알림
+            OnHpChanged?.Invoke((int)currentHp, (int)maxHp);
         }
 
         private void Update()
         {
             // 게임 오버이면 모든 입력/이동/접촉 데미지 중지 (애니메이션은 계속 재생)
-            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
-            {
-                inputVec = Vector2.zero;
-                if (rigid != null)
-                    rigid.velocity = Vector2.zero;
-
-                // 접촉 데미지 코루틴 정리
-                if (_contactCoroutines.Count > 0)
-                {
-                    foreach (var kv in _contactCoroutines)
-                    {
-                        if (kv.Value != null)
-                            StopCoroutine(kv.Value);
-                    }
-                    _contactCoroutines.Clear();
-                }
-
-                return;
-            }
-
             if (_joystick != null && _joystick.Direction != Vector2.zero)
             {
                 inputVec = _joystick.Direction;
@@ -122,6 +108,10 @@ namespace _60SecondsSurvivors.Player
             SoundManager.Instance?.PlayPlayerHit();
 
             currentHp -= amount;
+            if (currentHp < 0) currentHp = 0;
+
+            // HP 변경 알림
+            OnHpChanged?.Invoke((int)currentHp, (int)maxHp);
 
             StartHitFlash();
 
@@ -167,7 +157,9 @@ namespace _60SecondsSurvivors.Player
             if (percent <= 0) return;
             int heal = Mathf.CeilToInt(maxHp * percent);
             currentHp += heal;
-            if (currentHp > maxHp) currentHp = maxHp;
+            if (currentHp > maxHp) currentHp = (int)maxHp;
+
+            OnHpChanged?.Invoke((int)currentHp, (int)maxHp);
         }
 
         public void AddMoveSpeedPercent(float percent)
@@ -191,7 +183,7 @@ namespace _60SecondsSurvivors.Player
             if (material != null)
                 material.SetFloat("_Invincible", 1f);
 
-            yield return new WaitForSecondsRealtime(duration);
+            yield return new WaitForSeconds(duration);
 
             if (material != null)
                 material.SetFloat("_Invincible", 0f);
@@ -206,6 +198,13 @@ namespace _60SecondsSurvivors.Player
             {
                 GameManager.Instance.OnPlayerDied();
             }
+
+            foreach (var kv in _contactCoroutines)
+            {
+                if (kv.Value != null)
+                    StopCoroutine(kv.Value);
+            }
+            _contactCoroutines.Clear();
 
             animator.SetTrigger("Dead");
             rigid.velocity = Vector2.zero;
