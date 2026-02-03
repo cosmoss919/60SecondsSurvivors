@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: EnemyData_3
   m_EditorClassIdentifier: 
   prefab: {fileID: 5543166817948902273, guid: 42ae61db6c6d68e4795240caf3e06018, type: 3}
-  maxHp: 7
+  maxHp: 4
   moveSpeed: 2
   contactDamage: 3
   damageTick: 1
   score: 20
+  dropChance: 0.7

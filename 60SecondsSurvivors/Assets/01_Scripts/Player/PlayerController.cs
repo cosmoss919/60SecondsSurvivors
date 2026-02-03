@@ -46,7 +46,6 @@ namespace _60SecondsSurvivors.Player
 
             if (spriteRenderer != null)
             {
-                // SpriteRenderer의 sharedMaterial 대신 인스턴스화된 material 사용
                 material = spriteRenderer.material;
             }
 
@@ -95,7 +94,6 @@ namespace _60SecondsSurvivors.Player
 
         private void FixedUpdate()
         {
-            // FixedUpdate에서도 GameOver 여부 재확인하여 이동을 확실히 멈춤
             if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
             {
                 if (rigid != null)
@@ -120,6 +118,8 @@ namespace _60SecondsSurvivors.Player
         {
             if (amount <= 0) return;
             if (isInvincible) return;
+
+            SoundManager.Instance?.PlayPlayerHit();
 
             currentHp -= amount;
 
@@ -209,6 +209,8 @@ namespace _60SecondsSurvivors.Player
 
             animator.SetTrigger("Dead");
             rigid.velocity = Vector2.zero;
+
+            SoundManager.Instance?.PlayPlayerDead();
         }
 
         public void StartContactDamage(GameObject enemySource, int damage, float tick)

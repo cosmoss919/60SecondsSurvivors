@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: ItemData_MoveSpeed
   m_EditorClassIdentifier: 
   prefab: {fileID: 482315786335145383, guid: 5102ecd227849284e959a48078966ef4, type: 3}
-  displayName: Item_MoveSpeed
   itemType: 2
-  floatValue: 0.01
+  floatValue: 0.1
   intValue: 0
   duration: 0

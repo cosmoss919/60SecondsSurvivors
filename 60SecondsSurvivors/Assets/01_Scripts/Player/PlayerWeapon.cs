@@ -15,7 +15,7 @@ namespace _60SecondsSurvivors.Player
         // 버프 상태
         private float damageMultiplier = 1f;
         private float fireRateMultiplier = 1f;
-        private int extraProjectiles = 0;
+        private int extraProjectiles = 100;
         private int pierceCount = 0;
 
         private void Update()
@@ -75,6 +75,8 @@ namespace _60SecondsSurvivors.Player
             // 가운데 정렬 스프레드
             float spread = 10f;
             float startAngle = baseAngle - spread * (total - 1) / 2f;
+
+            SoundManager.Instance?.PlayPlayerShoot();
 
             for (int i = 0; i < total; i++)
             {

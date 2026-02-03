@@ -177,3 +177,4 @@ MonoBehaviour:
   pierce: 0
   knockbackForce: 10
   knockbackDuration: 0.12
+  useJobMovement: 1

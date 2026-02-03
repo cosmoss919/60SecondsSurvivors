@@ -23,6 +23,9 @@ namespace _60SecondsSurvivors.Projectile
         private int initialDamage;
         private int initialPierce;
 
+        // Job 기반 이동 사용 여부 (기본: true)
+        [SerializeField] private bool useJobMovement = true;
+
         private void Awake()
         {
             rigid = GetComponent<Rigidbody2D>();
@@ -36,14 +39,37 @@ namespace _60SecondsSurvivors.Projectile
             lifeTime = initialLifeTime;
             damage = initialDamage;
             pierce = initialPierce;
-            if (rigid != null)
+            if (rigid != null && !useJobMovement)
                 rigid.velocity = Vector2.zero;
+
+            // Register to mover if available and using job movement
+            if (useJobMovement && ProjectileMover.Instance != null)
+                ProjectileMover.Instance.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            // Unregister from mover
+            if (useJobMovement && ProjectileMover.Instance != null)
+                ProjectileMover.Instance.Unregister(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (useJobMovement && ProjectileMover.Instance != null)
+                ProjectileMover.Instance.Unregister(this);
         }
 
         public void SetDirection(Vector2 direction)
         {
             if (direction.sqrMagnitude > 0.001f)
                 this.direction = direction.normalized;
+        }
+
+        // 외부(ProjectileMover)에서 읽을 수 있도록 velocity 반환
+        public Vector3 GetVelocity()
+        {
+            return (Vector3)direction * speed;
         }
 
         public void MultiplyDamage(float factor)
@@ -58,7 +84,8 @@ namespace _60SecondsSurvivors.Projectile
 
         private void FixedUpdate()
         {
-            if (GameManager.Instance != null && GameManager.Instance.IsGameOver)
+            // 기존 물리 이동은 사용하지 않음 when job mover present
+            if (useJobMovement && ProjectileMover.Instance != null)
             {
                 if (rigid != null)
                     rigid.velocity = Vector2.zero;
@@ -74,6 +101,9 @@ namespace _60SecondsSurvivors.Projectile
             lifeTime -= Time.deltaTime;
             if (lifeTime <= 0f)
             {
+                if (useJobMovement && ProjectileMover.Instance != null)
+                    ProjectileMover.Instance.Unregister(this);
+
                 if (PoolManager.Instance != null)
                     PoolManager.Instance.ReleaseToPool(gameObject);
                 else
@@ -98,6 +128,9 @@ namespace _60SecondsSurvivors.Projectile
                     pierce--;
                     return;
                 }
+
+                if (useJobMovement && ProjectileMover.Instance != null)
+                    ProjectileMover.Instance.Unregister(this);
 
                 if (PoolManager.Instance != null)
                     PoolManager.Instance.ReleaseToPool(gameObject);

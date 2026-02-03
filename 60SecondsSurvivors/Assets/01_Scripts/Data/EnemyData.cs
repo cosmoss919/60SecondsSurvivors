@@ -15,6 +15,11 @@ namespace _60SecondsSurvivors.Data
         [Header("Score")]
         [Tooltip("이 적을 처치했을 때 부여되는 점수")]
         public int score = 10;
+
+        [Header("Drops")]
+        [Range(0f, 1f)]
+        [Tooltip("이 적이 아이템을 드랍할 확률 (0~1)")]
+        public float dropChance = 0.35f;
     }
 }
 

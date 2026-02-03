@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phases:
   - startTime: 0
-    endTime: 20
+    endTime: 10
     spawnInterval: 1.5
     enemy: {fileID: 11400000, guid: 285971bb5332dce4699fc9e8a314f16f, type: 2}
     enemies: []
-  - startTime: 20
-    endTime: 40
+  - startTime: 10
+    endTime: 30
     spawnInterval: 1
     enemy: {fileID: 0}
     enemies:
@@ -27,7 +27,7 @@ MonoBehaviour:
       weight: 60
     - enemy: {fileID: 11400000, guid: b910aa0ee79d36c4ca32e04469b52c66, type: 2}
       weight: 40
-  - startTime: 40
+  - startTime: 30
     endTime: 60
     spawnInterval: 0.6
     enemy: {fileID: 0}

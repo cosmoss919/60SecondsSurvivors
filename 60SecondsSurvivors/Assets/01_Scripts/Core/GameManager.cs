@@ -40,6 +40,7 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
+            SoundManager.Instance?.PlayGameOver();
             StartCoroutine(DelayedLoadResult());
         }
 
@@ -48,6 +49,7 @@ namespace _60SecondsSurvivors.Core
             if (_isGameOver) return;
 
             _isGameOver = true;
+            SoundManager.Instance?.PlayGameClear();
             StartCoroutine(DelayedLoadResult());
         }
 

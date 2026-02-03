@@ -13,6 +13,7 @@ namespace _60SecondsSurvivors.Core
 
         public static void LoadTitleScene()
         {
+            SoundManager.Instance?.PlayTitleBgm();
             SceneManager.LoadScene(TitleSceneName);
         }
 
@@ -22,12 +23,14 @@ namespace _60SecondsSurvivors.Core
             {
                 GameManager.Instance.PrepareNewRun();
             }
+            SoundManager.Instance?.PlayGameBgm();
             SceneManager.LoadScene(GameSceneName);
         }
 
         public static void LoadResultScene()
         {
             GameResult.Set(ScoreManager.Instance.CurrentScore);
+            SoundManager.Instance?.StopMusic();
             SceneManager.LoadScene(ResultSceneName);
         }
     }

@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: ItemData_FireRate
   m_EditorClassIdentifier: 
   prefab: {fileID: 4949641165569455925, guid: 50686ec56cf2de14cb494675f0404757, type: 3}
-  displayName: Item_FireRate
   itemType: 0
-  floatValue: 0.01
+  floatValue: 0.1
   intValue: 0
   duration: 0

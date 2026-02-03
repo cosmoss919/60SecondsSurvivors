@@ -18,17 +18,14 @@ namespace _60SecondsSurvivors.Item
 
     public class ItemBase : MonoBehaviour, IPoolable
     {
-        // 런타임에서 사용되는 ItemData 레퍼런스
         private ItemData runtimeData;
 
         public ItemData Data => runtimeData;
 
         public void OnSpawned()
         {
-            // 필요 시 초기화
         }
 
-        // ItemDropper 등에서 데이터 주입
         public void SetData(ItemData data)
         {
             runtimeData = data;
@@ -41,7 +38,6 @@ namespace _60SecondsSurvivors.Item
             {
                 ApplyToPlayer(player);
 
-                // Pool 사용 시 반환, 아니면 비활성화
                 if (PoolManager.Instance != null)
                     PoolManager.Instance.ReleaseToPool(gameObject);
                 else
@@ -101,8 +97,10 @@ namespace _60SecondsSurvivors.Item
                     break;
             }
 
-            // displayName 제거됨 — 항상 popupText 사용
             GameHUD.Instance?.ShowPickup(popupText);
+
+            SoundManager.Instance?.PlayItemPickup();
+
         }
     }
 }

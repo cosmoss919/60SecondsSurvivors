@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: ItemData_Damage
   m_EditorClassIdentifier: 
   prefab: {fileID: 985820593318814217, guid: a2f89b1c1b7421545bb3babd0ed851df, type: 3}
-  displayName: Item_Damage
   itemType: 1
-  floatValue: 0.01
+  floatValue: 1
   intValue: 0
   duration: 0

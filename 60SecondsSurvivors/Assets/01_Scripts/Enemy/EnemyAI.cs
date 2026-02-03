@@ -2,6 +2,7 @@ using UnityEngine;
 using _60SecondsSurvivors.Player;
 using _60SecondsSurvivors.Core;
 using System.Collections;
+using _60SecondsSurvivors.Item;
 
 namespace _60SecondsSurvivors.Enemy
 {
@@ -64,6 +65,20 @@ namespace _60SecondsSurvivors.Enemy
                 target = player.transform;
             }
         }
+        public void OnEnable()
+        {
+            _currentHp = _maxHp;
+            _state = EnemyState.Alive;
+            IsStunned = false;
+
+            if (_collider != null) _collider.enabled = true;
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("Hit");
+                animator.SetBool("Dead", false);
+            }
+        }
 
         private void FixedUpdate()
         {
@@ -113,26 +128,13 @@ namespace _60SecondsSurvivors.Enemy
             }
         }
 
-        public void OnSpawned()
-        {
-            _currentHp = _maxHp;
-            _state = EnemyState.Alive;
-            IsStunned = false;
-
-            // 리셋: 콜라이더/애니메이터 상태
-            if (_collider != null) _collider.enabled = true;
-
-            if (animator != null)
-            {
-                animator.ResetTrigger("Hit");
-                animator.SetBool("Dead", false);
-            }
-        }
 
         public void TakeDamage(int amount)
         {
             if (!IsAlive) return;
             if (amount <= 0) return;
+
+            SoundManager.Instance?.PlayEnemyHit();
 
             if (animator != null)
                 animator.SetTrigger("Hit");
@@ -160,8 +162,10 @@ namespace _60SecondsSurvivors.Enemy
 
             ScoreManager.Instance?.AddScore(enemyBase.Data.score);
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1.5f);
 
+            float enemyDropChance = enemyBase.Data != null ? enemyBase.Data.dropChance : -1f;
+            ItemDropper.Instance?.TryDrop(transform.position, enemyDropChance);
             PoolManager.Instance?.ReleaseToPool(gameObject);
         }
 
